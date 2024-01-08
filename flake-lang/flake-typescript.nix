@@ -7,7 +7,7 @@ pkgs:
   # ```
   # for the the extra dependencies (not included in the `package.json`) for
   # `node` to execute. This will _not_ install the "transitive" dependencies.
-  # 
+  #
   # Loosely, this will (in the order given) copy each tarball to a local
   # directory, call `npm cache` on the tarball, and finally call `npm install`.
   #
@@ -25,7 +25,7 @@ pkgs:
   # in ...
   # ```
 
-  npmDependencies ? [ ]
+  npmExtraDependencies ? [ ]
 , # The script to build the project i.e., `npm run ${npmBuildScript}` is
   # executed.
   npmBuildScript ? "build"
@@ -41,8 +41,8 @@ pkgs:
 , ...
 }:
 let
-  npmLocalDependencies =
-    pkgs.callPackage (import ./typescript/npm-local-dependencies.nix) { } { inherit name npmDependencies; };
+  npmExtraDependenciesInfo =
+    pkgs.callPackage (import ./typescript/npm-extra-dependencies.nix) { } { inherit name npmExtraDependencies; };
 
   projectNode2nix = pkgs.stdenv.mkDerivation {
     name = "${name}-node2nix";
@@ -50,7 +50,7 @@ let
     buildInputs = [ pkgs.node2nix nodejs ];
     configurePhase =
       ''
-        ${npmLocalDependencies.npmLocalDependenciesLinkCommand}
+        ${npmExtraDependenciesInfo.npmLinkExtraDependencies}
       '';
 
     buildPhase =
@@ -86,12 +86,12 @@ let
       # building it.
       preRebuild =
         ''
-          ${npmLocalDependencies.npmLocalDependenciesLinkCommand}
+          ${npmExtraDependenciesInfo.npmLinkExtraDependencies}
         '';
 
       # TODO(jaredponn): Wow this is horrible. `npm install` is broken for
-      # local dependencies on the filesystem. I think something the following
-      # is problematic [this may not be an issue for later versions /
+      # local dependencies on the filesystem. I think something like the
+      # following is problematic [this may not be an issue for later versions /
       # lockfiles? needs more investigations]:
       # - Suppose A is a tarball and depends on tarball B
       # - Assume that we have a "sensible" `package.json` and
@@ -109,7 +109,10 @@ let
 
   # Build the project (runs `npm run build`)
   # TODO(jaredponn): perhaps we should do something else instead of just
-  # dumping everything to the nix store..
+  # dumping everything to the nix store. Some ideas:
+  #     - Do what `buildNpmPackage` i.e., copy the files declared in the
+  #     `package.json` to `lib/node_modules/<package>` [which coincidentally is
+  #     what `npm link` does as well]
   project = pkgs.stdenv.mkDerivation {
     name = "${name}-typescript";
     inherit src;
@@ -124,19 +127,29 @@ let
         runHook postConfigure
       '';
 
+    # Set some environment variables for npm
+    NPM_CONFIG_OFFLINE = true;
+    NPM_CONFIG_LOGLEVEL = "verbose";
+
     buildPhase =
       ''
+        runHook preBuild
+
         export HOME=$(mktemp -d)
-        export NPM_CONFIG_OFFLINE=true
-        export NPM_CONFIG_LOGLEVEL=verbose
 
         npm run ${npmBuildScript}
+
+        runHook postBuild
       '';
 
     installPhase =
       ''
+        runHook preInstall
+
         mkdir -p $out
         cp -r ./. $out
+
+        runHook postInstall
       '';
   };
 
@@ -148,7 +161,7 @@ let
         ${devShellHook}
 
         linkNpmDependencies( ) {
-            ${npmLocalDependencies.npmLocalDependenciesLinkCommand}
+            ${npmExtraDependenciesInfo.npmLinkExtraDependencies}
         }
 
         echo 'Executing `linkNpmDependencies` to link dependencies from nix...' 
@@ -195,7 +208,7 @@ in
   packages = {
     "${name}-typescript" = project;
     "${name}-typescript-tgz" = npmPack;
-    "${name}-typescript-nix-npm-folder-dependencies" = npmLocalDependencies.npmLocalDependenciesDerivation;
+    "${name}-typescript-nix-npm-extra-dependencies" = npmExtraDependenciesInfo.npmExtraDependenciesDerivation;
     "${name}-typescript-node2nix" = projectNode2nix;
   };
 
