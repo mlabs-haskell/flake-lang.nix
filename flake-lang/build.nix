@@ -1,62 +1,77 @@
-# { config, inputs, flake-parts-lib, lib, ... }: {
-{ inputs, flake-parts-lib, lib, ... }: {
+# Note(jaredponn): 
 
-  # # Makes a system agnostic option (dunno why I needed this).
-  # options.lbf-nix = lib.mkOption {
-  #   type = lib.types.anything; # probably not the best type
-  #   default = { };
-  # };
+# Loosely, the key idea is that in this flake we want to have an attribute like
+# ```
+# lbf-nix.<system> = {
+#   haskellFlake = ...
+#   rustFlake = ...
+#   typescriptFlake = ...
+#   ...
+# };
+# ```
+# This is unfortunately not super easy to do with flake-parts! Some useful
+# links + examples are as follows. 
+# - [1] https://github.com/hercules-ci/flake-parts/blob/main/lib.nix
+# - [2] https://github.com/hercules-ci/flake-parts/pull/63/files
+# - [3] https://github.com/hercules-ci/flake-parts/blob/main/modules/formatter.nix
 
-  # # Makes it available in the system agnostic `lib` argument.
-  # config = {
-  #   _module.args.lib = config.flake.lib // {
-  #     inherit (config) lbf-nix;
-  #   };
-
-  #   # Sets the above set option to system ones.
-  #   lbf-nix = lib.genAttrs config.systems (system: (config.perSystem system).lbf-nix);
-
-  #   # Makes `lib.x86_64-linux.xyz` available
-  #   flake.lib = config.lbf-nix;
-  # };
-
+{ config, inputs, flake-parts-lib, lib, ... }: {
   options = {
+    perSystem = flake-parts-lib.mkPerSystemOption ({ pkgs, pkgsForCtl, pkgsForHaskellNix, pkgsForRust, ... }: {
+      options = {
+        lib = {
+          purescriptFlake = lib.mkOption {
+            type = lib.types.functionTo lib.types.raw;
+            default = import ./flake-purescript.nix pkgsForCtl;
+            readOnly = true;
+            description = ''
+              TODO(jaredponn): write down documentation here
+            '';
+          };
 
-    # Makes a per system `lbf-nix` option.
-    perSystem = flake-parts-lib.mkPerSystemOption
-      ({ pkgs, config, pkgsForCtl, pkgsForHaskellNix, pkgsForRust, ... }: {
+          rustFlake = lib.mkOption {
+            type = lib.types.functionTo lib.types.raw;
+            default = import ./flake-rust.nix pkgsForRust;
+            readOnly = true;
+            description = ''
+              TODO(jaredponn): write down documentation here
+            '';
+          };
 
-        options.lbf-nix = lib.mkOption {
-          type = lib.types.anything;
-          default = { };
+          haskellFlake = lib.mkOption {
+            type = lib.types.functionTo lib.types.raw;
+            default = import ./flake-haskell.nix pkgsForHaskellNix;
+            readOnly = true;
+            description = ''
+              TODO(jaredponn): write down documentation here
+            '';
+          };
+
+          haskellPlutusFlake = lib.mkOption {
+            type = lib.types.functionTo lib.types.raw;
+            default = import ./flake-haskell-plutus.nix inputs.cardano-haskell-packages pkgsForHaskellNix;
+            readOnly = true;
+            description = ''
+              TODO(jaredponn): write down documentation here
+            '';
+          };
+
+          typescriptFlake = lib.mkOption {
+            type = lib.types.functionTo lib.types.raw;
+            default = import ./flake-typescript.nix pkgs;
+            readOnly = true;
+            description = ''
+              TODO(jaredponn): write down documentation here
+            '';
+          };
+
         };
-
-        # Sets a per system `lbf-nix` option.
-        config = {
-          devShells.dev-nix = pkgs.mkShell {
-            name = "dev-nix";
-            shellHook = config.settings.shell.hook;
-            buildInputs = config.settings.shell.tools;
-          };
-
-          lbf-nix = {
-            purescriptFlake = import ./flake-purescript.nix pkgsForCtl;
-
-            rustFlake = import ./flake-rust.nix pkgsForRust;
-            haskellData = import ./haskell-data.nix pkgs;
-            haskellFlake = import ./flake-haskell.nix pkgsForHaskellNix;
-            haskellPlutusFlake = import ./flake-haskell-plutus.nix inputs.cardano-haskell-packages pkgsForHaskellNix;
-            typescriptFlake = import ./flake-typescript.nix pkgs;
-          };
-
-          # Makes it available in the per system `lib` argument.
-          _module.args.lib = lib // {
-            inherit (config) lbf-nix;
-          };
-
-        };
-
-      });
-
+      };
+    });
   };
+
+  config = {
+    transposition.lib = { };
+  };
+
 }

@@ -2,7 +2,7 @@ _:
 {
   perSystem = { config, pkgs, ... }:
     let
-      hsFlake = config.lbf-nix.haskellFlake {
+      hsFlake = config.lib.haskellFlake {
         src = ./.;
 
         name = "haskell-flake-project";
