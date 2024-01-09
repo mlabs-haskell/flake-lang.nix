@@ -140,7 +140,7 @@ let
 
         export HOME=$(mktemp -d)
 
-        npm run ${npmBuildScript}
+        npm run "$npmBuildScript"
 
         runHook postBuild
       '';
