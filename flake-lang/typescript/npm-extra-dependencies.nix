@@ -29,7 +29,7 @@ lib.makeExtensible
         text = ''
           echo "Linking dependencies \`${self.npmExtraDependencies}\` to \`${self.npmExtraDependenciesFolder}\`"
           rm -rf ${self.npmExtraDependenciesFolder}
-          ln -sf "${self.npmExtraDependencies}" ${self.npmExtraDependenciesFolder}
+          ln -sf "${self.npmExtraDependencies}" "${self.npmExtraDependenciesFolder}"
         '';
       };
   }

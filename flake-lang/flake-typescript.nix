@@ -47,10 +47,10 @@ let
   projectNode2nix = pkgs.stdenv.mkDerivation {
     name = "${name}-node2nix";
     inherit src;
-    buildInputs = [ pkgs.node2nix nodejs ];
+    buildInputs = [ pkgs.node2nix nodejs npmExtraDependenciesInfo.npmLinkExtraDependencies ];
     configurePhase =
       ''
-        ${npmExtraDependenciesInfo.npmLinkExtraDependencies}
+        ${npmExtraDependenciesInfo.npmLinkExtraDependencies.name}
       '';
 
     buildPhase =
@@ -86,7 +86,7 @@ let
       # building it.
       preRebuild =
         ''
-          ${npmExtraDependenciesInfo.npmLinkExtraDependencies}
+          ${npmExtraDependenciesInfo.npmLinkExtraDependencies}/bin/${npmExtraDependenciesInfo.npmLinkExtraDependencies.name}
         '';
 
       # TODO(jaredponn): Wow this is horrible. `npm install` is broken for
@@ -157,18 +157,15 @@ let
   };
 
   shell = pkgs.mkShell {
-    packages = [ nodejs ] ++ devShellTools;
+    packages = [ nodejs npmExtraDependenciesInfo.npmLinkExtraDependencies ] ++ devShellTools;
 
     shellHook =
       ''
         ${devShellHook}
 
-        linkNpmDependencies( ) {
-            ${npmExtraDependenciesInfo.npmLinkExtraDependencies}
-        }
+        echo 'Linking the extra dependencies from nix with command `${npmExtraDependenciesInfo.npmLinkExtraDependencies.name}`...' 
 
-        echo 'Executing `linkNpmDependencies` to link dependencies from nix...' 
-        linkNpmDependencies
+        ${npmExtraDependenciesInfo.npmLinkExtraDependencies.name}
       '';
 
   };
@@ -189,7 +186,7 @@ let
   # Run tests with `npm test`.
   test = project.overrideAttrs (_self: super:
     {
-      # Append the build command at the end.
+      # Append the test command at the end.
       postBuild =
         ''
           npm test
@@ -211,7 +208,7 @@ in
   packages = {
     "${name}-typescript" = project;
     "${name}-typescript-tgz" = npmPack;
-    "${name}-typescript-nix-npm-extra-dependencies" = npmExtraDependenciesInfo.npmExtraDependenciesDerivation;
+    "${name}-typescript-npm-extra-dependencies" = npmExtraDependenciesInfo.npmExtraDependenciesDerivation;
     "${name}-typescript-node2nix" = projectNode2nix;
   };
 
