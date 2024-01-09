@@ -127,6 +127,9 @@ let
         runHook postConfigure
       '';
 
+    # Allow the the user to override the build script
+    inherit npmBuildScript;
+
     # Set some environment variables for npm
     NPM_CONFIG_OFFLINE = true;
     NPM_CONFIG_LOGLEVEL = "verbose";
@@ -189,7 +192,7 @@ let
       # Append the build command at the end.
       postBuild =
         ''
-          npm --log-level=verbose test
+          npm test
         '';
       installPhase =
         ''
