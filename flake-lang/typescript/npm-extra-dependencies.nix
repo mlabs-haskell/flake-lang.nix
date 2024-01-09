@@ -20,14 +20,14 @@ lib.makeExtensible
         ${builtins.concatStringsSep "\n" (builtins.map (dep: ''ln -sf "${dep}/tarballs/"* .'') npmExtraDependencies)}
       '';
 
-    npmExtraDependenciesFolder = "./extra-packages";
+    npmExtraDependenciesFolder = "./extra-dependencies";
 
     npmLinkExtraDependencies = writeShellApplication
       {
         name = "${name}-npm-link-extra-dependencies";
         runtimeInputs = [ ];
         text = ''
-          echo 'Linking dependencies `${self.npmExtraDependencies}` to `${self.npmExtraDependenciesFolder}`'
+          echo "Linking dependencies \`${self.npmExtraDependencies}\` to \`${self.npmExtraDependenciesFolder}\`"
           rm -rf ${self.npmExtraDependenciesFolder}
           ln -sf "${self.npmExtraDependencies}" ${self.npmExtraDependenciesFolder}
         '';
