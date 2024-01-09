@@ -10,7 +10,6 @@
 lib.makeExtensible
   (self:
   {
-
     npmExtraDependencies = runCommand
       "${name}-npm-extra-dependencies"
       { }
@@ -18,7 +17,7 @@ lib.makeExtensible
         # Symlinks all the provided dependencies to $out
         mkdir -p $out
         cd $out
-        ${builtins.concatStringsSep "\n" (builtins.map (dep: ''ln -sf "${dep}/tarballs/"* .'') npmExtraDependencies) }
+        ${builtins.concatStringsSep "\n" (builtins.map (dep: ''ln -sf "${dep}/tarballs/"* .'') npmExtraDependencies)}
       '';
 
     npmExtraDependenciesFolder = "./extra-packages";
@@ -32,6 +31,6 @@ lib.makeExtensible
           rm -rf ${self.npmExtraDependenciesFolder}
           ln -sf "${self.npmExtraDependencies}" ${self.npmExtraDependenciesFolder}
         '';
-      }
-      }
-      )
+      };
+  }
+  )
