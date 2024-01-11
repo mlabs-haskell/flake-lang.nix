@@ -6,5 +6,6 @@ _:
   imports =
     [
       ./haskell-flake-project/build.nix
+      ./rust-flake-project/build.nix
     ];
 }

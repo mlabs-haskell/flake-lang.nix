@@ -36,12 +36,12 @@
         ];
       };
 
-      # pkgsForRust = import inputs.nixpkgs {
-      #   inherit system;
-      #   overlays = [
-      #     (import inputs.rust-overlay)
-      #   ];
-      # };
+      pkgsForRust = import inputs.nixpkgs {
+        inherit system;
+        overlays = [
+          (import inputs.rust-overlay)
+        ];
+      };
     };
   };
 }
