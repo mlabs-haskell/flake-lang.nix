@@ -1,0 +1,27 @@
+{
+  "name": "typescript-flake-project",
+  "version": "1.0.0",
+  "description": "Typescript flake sample project",
+  "lockfileVersion": 2,
+  "exports": {
+    ".": "./dist/MyLib/index.js",
+    "./package.json": "./package.json"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "npx tsc -b src",
+    "test": ":"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mlabs-haskell/flake-lang.nix"
+  },
+  "author": "Jared Pon",
+  "license": "ISC",
+  "files": [
+    "./dist/**/*"
+  ],
+  "dependencies": {
+    "typescript": "^5.3.3"
+  }
+}
