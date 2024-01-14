@@ -69,7 +69,8 @@ pkgs.lib.makeExtensible
           ''
             mkdir -p $out
             cd $out
-            ${builtins.concatStringsSep "\n" (builtins.map (dep: ''cp -r "${dep}/tarballs/"* .'') npmExtraDependenciesTransitiveClosure)}
+
+            ${builtins.concatStringsSep "\n" (builtins.map (dep: ''cp -r --update=none "${dep}/tarballs/"* .'') npmExtraDependenciesTransitiveClosure)}
           '';
 
       # Shell script to link the dependencies copied in `npmExtraDependenciesTransitiveClosure`.
