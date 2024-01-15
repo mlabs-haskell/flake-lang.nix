@@ -65,8 +65,8 @@
         # Nix tools
         ./flake-lang/build.nix
 
-        # Tests
-        ./tests/build.nix
+        # Examples/Tests
+        ./examples/build.nix
       ];
     };
 }
