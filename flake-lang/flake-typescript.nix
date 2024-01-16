@@ -46,7 +46,7 @@ pkgs.lib.makeExtensible
     # Overlayable attributes
     # These attributes are considered internal.
     ################################
-    __typescriptFlake__ = {
+    __typescriptFlake__ = pkgs.lib.makeExtensible (tsSelf: with tsSelf; {
       # We assume that all dependencies have their transitive closure stored in the
       # `npmExtraDependencies` attribute; so it follows that we can compute the
       # transitive closure by concatenating all dependencies together.
@@ -54,6 +54,8 @@ pkgs.lib.makeExtensible
       npmExtraDependenciesTransitiveClosure = builtins.concatMap (dep: [ dep ] ++ (dep.npmExtraDependencies or [ ])) npmExtraDependencies;
 
       # Folder to put the extra dependencies in
+      # WARNING: we have to be a bit careful about this -- the `package.json`'s
+      # expect the dependencies to be put in a specific folder.
       npmExtraDependenciesFolder = "./extra-dependencies";
 
       # Creates a nix derivation with all the extra npm dependencies provided
@@ -73,22 +75,21 @@ pkgs.lib.makeExtensible
             ${builtins.concatStringsSep "\n" (builtins.map (dep: ''cp -r --update=none "${dep}/tarballs/"* .'') npmExtraDependenciesTransitiveClosure)}
           '';
 
-      # Shell script to link the dependencies copied in `npmExtraDependenciesTransitiveClosure`.
+      # Shell script to create the dependencies copied in `npmExtraDependenciesTransitiveClosure`.
       # Normally, this is run in the `configurePhase` to add the extra sources.
-      npmLinkExtraDependencies = pkgs.writeShellApplication
-        {
-          name = "${name}-npm-link-extra-dependencies";
+      mkNpmExtraDependenciesCmd =
+        let cmdName = "${name}-npm-link-extra-dependencies";
+        in pkgs.writeShellApplication rec {
+          name = cmdName;
           runtimeInputs = [ ];
           text = ''
-            echo "Linking dependencies \`${mkNpmExtraDependencies}\` to \`${npmExtraDependenciesFolder}\`"
+            echo "${name}: copying \`${mkNpmExtraDependencies}/.\` to \`${npmExtraDependenciesFolder}\`"
 
-            if [ -e ${npmExtraDependenciesFolder} ]
-            then
-                echo "WARNING: removing already existing \`${npmExtraDependenciesFolder}\`" 1>&2
-            fi
+            cp -r "${mkNpmExtraDependencies}"/. "${npmExtraDependenciesFolder}"
 
-            rm -rf ${npmExtraDependenciesFolder}
-            cp -r "${mkNpmExtraDependencies}" "${npmExtraDependenciesFolder}"
+            # Give the directory sane permissions so users can delete it w/o
+            # sudo
+            chmod -R "=755" "${npmExtraDependenciesFolder}"
           '';
         };
 
@@ -97,12 +98,12 @@ pkgs.lib.makeExtensible
       srcWithNode2nix = pkgs.stdenv.mkDerivation {
         name = "${name}-node2nix";
         inherit src;
-        buildInputs = [ pkgs.node2nix nodejs npmLinkExtraDependencies ];
+        buildInputs = [ pkgs.node2nix nodejs mkNpmExtraDependenciesCmd ];
         configurePhase =
           ''
             runHook preConfigure
 
-            ${npmLinkExtraDependencies.name}
+            ${mkNpmExtraDependenciesCmd.name}
 
             runHook postConfigure
           '';
@@ -152,7 +153,7 @@ pkgs.lib.makeExtensible
           # building it.
           preRebuild =
             ''
-              ${npmLinkExtraDependencies}/bin/${npmLinkExtraDependencies.name}
+              ${mkNpmExtraDependenciesCmd}/bin/${mkNpmExtraDependenciesCmd.name}
             '';
 
           # TODO(jaredponn): Wow this is horrible. `npm install` is broken for
@@ -238,15 +239,13 @@ pkgs.lib.makeExtensible
       };
 
       shell = pkgs.mkShell {
-        packages = [ nodejs npmLinkExtraDependencies ] ++ devShellTools;
+        packages = [ nodejs mkNpmExtraDependenciesCmd ] ++ devShellTools;
 
         shellHook =
           ''
+            ${mkNpmExtraDependenciesCmd.name}
+
             ${devShellHook}
-
-            echo 'Linking the extra dependencies from nix with command `${npmLinkExtraDependencies.name}`...' 
-
-            ${npmLinkExtraDependencies.name}
           '';
 
       };
@@ -279,7 +278,7 @@ pkgs.lib.makeExtensible
 
           buildInputs = super.buildInputs ++ testTools;
         });
-    };
+    });
 
     ################################
     # Output derivations to use in your flake.
