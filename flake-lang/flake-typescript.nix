@@ -245,6 +245,12 @@ pkgs.lib.makeExtensible
           ''
             ${mkNpmExtraDependenciesCmd.name}
 
+            export NODE_PATH="${npmPackage}/lib/node_modules/${srcWithNode2nixIfd.args.packageName}/node_modules"
+
+            echo 'Removing existing `node_modules`, and creating a symbolic link to `$NODE_PATH` with name `node_modules`...'
+            rm -rf node_modules
+            ln -sf "$NODE_PATH" node_modules
+
             ${devShellHook}
           '';
 
