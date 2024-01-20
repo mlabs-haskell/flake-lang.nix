@@ -78,7 +78,7 @@ pkgs.lib.makeExtensible
       # Shell script to create the dependencies copied in `npmExtraDependenciesTransitiveClosure`.
       # Normally, this is run in the `configurePhase` to add the extra sources.
       mkNpmExtraDependenciesCmd =
-        let cmdName = "${name}-npm-link-extra-dependencies";
+        let cmdName = "${name}-npm-extra-dependencies";
         in pkgs.writeShellApplication rec {
           name = cmdName;
           runtimeInputs = [ ];
