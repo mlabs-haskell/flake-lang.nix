@@ -58,6 +58,8 @@ pkgs.lib.makeExtensible
       # expect the dependencies to be put in a specific folder.
       npmExtraDependenciesFolder = "./extra-dependencies";
 
+
+
       # Creates a nix derivation with all the extra npm dependencies provided
       # by nix.
       # 
@@ -83,13 +85,13 @@ pkgs.lib.makeExtensible
           name = cmdName;
           runtimeInputs = [ ];
           text = ''
-            echo "${name}: copying \`${mkNpmExtraDependencies}/.\` to \`${npmExtraDependenciesFolder}\`"
+            printf "%s: copying \`%s/.\` to \`%s\`\n" ${pkgs.lib.escapeShellArg name} ${pkgs.lib.escapeShellArg mkNpmExtraDependencies} ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
 
-            cp -r "${mkNpmExtraDependencies}"/. "${npmExtraDependenciesFolder}"
+            cp -r ${pkgs.lib.escapeShellArg mkNpmExtraDependencies}/. ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
 
             # Give the directory sane permissions so users can delete it w/o
             # sudo
-            chmod -R "=755" "${npmExtraDependenciesFolder}"
+            chmod -R "=755" ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
           '';
         };
 
@@ -103,7 +105,7 @@ pkgs.lib.makeExtensible
           ''
             runHook preConfigure
 
-            ${mkNpmExtraDependenciesCmd.name}
+            ${pkgs.lib.escapeShellArg mkNpmExtraDependenciesCmd.name}
 
             runHook postConfigure
           '';
@@ -153,7 +155,7 @@ pkgs.lib.makeExtensible
           # building it.
           preRebuild =
             ''
-              ${mkNpmExtraDependenciesCmd}/bin/${mkNpmExtraDependenciesCmd.name}
+              ${pkgs.lib.escapeShellArg "${mkNpmExtraDependenciesCmd}/bin/${mkNpmExtraDependenciesCmd.name}"}
             '';
 
           # TODO(jaredponn): Wow this is horrible. `npm install` is broken for
@@ -204,7 +206,9 @@ pkgs.lib.makeExtensible
           ''
             runHook preConfigure
                 
-            ln -sf ${npmPackage}/lib/node_modules/${srcWithNode2nixIfd.args.packageName}/node_modules node_modules
+            ln -sf \
+                ${pkgs.lib.escapeShellArg "${npmPackage}/lib/node_modules/${srcWithNode2nixIfd.args.packageName}/node_modules"} \
+                node_modules
                 
             runHook postConfigure
           '';
@@ -231,8 +235,8 @@ pkgs.lib.makeExtensible
           ''
             runHook preInstall
 
-            mkdir -p $out
-            cp -r ./. $out
+            mkdir -p "$out"
+            cp -r ./. "$out"
 
             runHook postInstall
           '';
@@ -243,9 +247,9 @@ pkgs.lib.makeExtensible
 
         shellHook =
           ''
-            ${mkNpmExtraDependenciesCmd.name}
+            ${pkgs.lib.escapeShellArg mkNpmExtraDependenciesCmd.name}
 
-            export NODE_PATH="${npmPackage}/lib/node_modules/${srcWithNode2nixIfd.args.packageName}/node_modules"
+            export NODE_PATH=${pkgs.lib.escapeShellArg "${npmPackage}/lib/node_modules/${srcWithNode2nixIfd.args.packageName}/node_modules"}
 
             echo 'Removing existing `node_modules`, and creating a symbolic link to `$NODE_PATH` with name `node_modules`...'
             rm -rf node_modules
@@ -263,8 +267,8 @@ pkgs.lib.makeExtensible
           name = "${name}-tarball";
           installPhase =
             ''
-              mkdir -p $out/tarballs
-              npm pack --pack-destination $out/tarballs
+              mkdir -p "$out/tarballs"
+              npm pack --pack-destination "$out/tarballs"
             '';
         });
 
@@ -279,7 +283,7 @@ pkgs.lib.makeExtensible
             '';
           installPhase =
             ''
-              touch $out
+              touch "$out"
             '';
 
           buildInputs = super.buildInputs ++ testTools;
