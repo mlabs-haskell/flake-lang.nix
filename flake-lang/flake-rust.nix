@@ -5,6 +5,7 @@ pkgs:
 , crateName
 , rustVersion ? "latest"
 , nativeBuildInputs ? [ ]
+, buildInputs ? [ ]
 , extraSources ? [ ]
 , extraSourcesDir ? ".extras"
 , data ? [ ]
@@ -53,7 +54,7 @@ let
       };
 
   commonArgs = {
-    inherit nativeBuildInputs;
+    inherit nativeBuildInputs buildInputs;
     src = buildEnv;
     pname = crateName;
     strictDeps = true;
@@ -89,7 +90,7 @@ let
 in
 {
   devShells."dev-${crateName}-rust" = craneLib.devShell {
-    buildInputs = nativeBuildInputs;
+    buildInputs = buildInputs ++ nativeBuildInputs;
     packages = devShellTools ++ testTools;
     shellHook = ''
       ${linkExtraSources}
