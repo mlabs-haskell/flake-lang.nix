@@ -3,7 +3,8 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction</title>
+        <title></title>
+        <meta name="robots" content="noindex">
 
 
         <!-- Custom HTML head -->
@@ -88,7 +89,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html" class="active"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="api_reference.html"><strong aria-hidden="true">2.</strong> API Reference</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="api_reference.html"><strong aria-hidden="true">2.</strong> API Reference</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -176,15 +177,137 @@
                         <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
 <p>This library provides a set of Nix functions to make creating flakes for
 languages such as Haskell, PureScript, Rust, and TypeScript easier.</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="persystemlibhaskellflake"><a class="header" href="#persystemlibhaskellflake">perSystem.lib.haskellFlake</a></h2>
+<p>TODO(jaredponn): write down documentation here</p>
+<p><em>Type:</em>
+function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
+<p><em>Default:</em>
+<code>&lt;function&gt;</code></p>
+<p><em>Example:</em></p>
+<pre><code>''
+  TODO(jaredponn): write down an example here
+''
+</code></pre>
+<p><em>Declared by:</em></p>
+<ul>
+<li><a href="https://github.com/mlabs-haskell/flake-lang.nix/blob/master/flake-lang/build.nix">flake-lang/build.nix</a></li>
+</ul>
+<h2 id="persystemlibhaskellplutusflake"><a class="header" href="#persystemlibhaskellplutusflake">perSystem.lib.haskellPlutusFlake</a></h2>
+<p>TODO(jaredponn): write down documentation here</p>
+<p><em>Type:</em>
+function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
+<p><em>Default:</em>
+<code>&lt;function&gt;</code></p>
+<p><em>Example:</em></p>
+<pre><code>''
+  TODO(jaredponn): write down an example here
+''
+</code></pre>
+<p><em>Declared by:</em></p>
+<ul>
+<li><a href="https://github.com/mlabs-haskell/flake-lang.nix/blob/master/flake-lang/build.nix">flake-lang/build.nix</a></li>
+</ul>
+<h2 id="persystemlibpurescriptflake"><a class="header" href="#persystemlibpurescriptflake">perSystem.lib.purescriptFlake</a></h2>
+<p>TODO(jaredponn): write down documentation here</p>
+<p><em>Type:</em>
+function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
+<p><em>Default:</em>
+<code>&lt;function&gt;</code></p>
+<p><em>Example:</em></p>
+<pre><code>''
+  TODO(jaredponn): write down an example here
+''
+</code></pre>
+<p><em>Declared by:</em></p>
+<ul>
+<li><a href="https://github.com/mlabs-haskell/flake-lang.nix/blob/master/flake-lang/build.nix">flake-lang/build.nix</a></li>
+</ul>
+<h2 id="persystemlibrustflake"><a class="header" href="#persystemlibrustflake">perSystem.lib.rustFlake</a></h2>
+<p>TODO(jaredponn): write down documentation here</p>
+<p><em>Type:</em>
+function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
+<p><em>Default:</em>
+<code>&lt;function, args: {crane, crateName, data?, dataDir?, devShellHook?, devShellTools?, extraSources?, extraSourcesDir?, nativeBuildInputs?, rustVersion?, src, testTools?}&gt;</code></p>
+<p><em>Example:</em></p>
+<pre><code>''
+  TODO(jaredponn): write down an example here
+''
+</code></pre>
+<p><em>Declared by:</em></p>
+<ul>
+<li><a href="https://github.com/mlabs-haskell/flake-lang.nix/blob/master/flake-lang/build.nix">flake-lang/build.nix</a></li>
+</ul>
+<h2 id="persystemlibtypescriptflake"><a class="header" href="#persystemlibtypescriptflake">perSystem.lib.typescriptFlake</a></h2>
+<p>Creates a flake for a TypeScript project.</p>
+<p>Returns an attribute set of the form</p>
+<pre><code class="language-nix">{
+  devShells.&quot;${name}-typescript&quot; = derivation { ... };
+  packages.&quot;${name}-typescript&quot; = derivation { ... };
+  packages.&quot;${name}-typescript-tgz&quot; = derivation { ... };
+  packages.&quot;${name}-typescript-node2nix&quot; = derivation { ... };
+  checks.&quot;${name}-typescript-test&quot; = derivation { ... };
+}
+</code></pre>
+<p>where</p>
+<ul>
+<li>
+<p><code>packages.&quot;${name}-typescript&quot;</code> contains the project with a
+<code>node_modules/</code> provided by Nix (in the <code>configurePhase</code>), and
+its <code>buildPhase</code> runs <code>npm run &quot;$npmBuildScript&quot;</code> (where <code>npmBuildScript</code> is
+<code>build</code> by default).
+Indeed, one can overlay the entire derivation (which contains
+all its dependencies) to postprocess their project as they
+see fit. For example, one may want to generate documentation
+instead of building the project, by running:</p>
+<pre><code class="language-nix">packages.&quot;${name}-typescript&quot;.overrideAttrs (_self: _super: {
+  npmBuildScript = &quot;docs&quot;;
+  installPhase = 
+     ''
+         mv ./docs &quot;$out&quot;
+     '';
+ });
+</code></pre>
+<p>where we assume that the <code>package.json</code> contains
+<code>scripts.docs = &lt;some-script&gt;</code> which produces documentation
+in the <code>./docs</code> folder.</p>
+</li>
+<li>
+<p><code>devShells.&quot;${name}-typescript-test&quot;</code> provides a developer shell with
+the environment variable <code>NODE_PATH</code> as the path to the
+<code>node_modules/</code> produced by Nix, and the command
+<code>${name}-npm-extra-dependencies</code> which copies the transitive
+closure of <code>npmExtraDependencies</code> to the folder <code>./extra-dependencies</code>.</p>
+<p>Moreover, the <code>shellHook</code> will:</p>
+<ul>
+<li>create a symbolic link named <code>node_modules</code> pointing to
+<code>$NODE_PATH</code>; and</li>
+<li>executes <code>${name}-npm-extra-dependencies</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>packages.&quot;${name}-typescript-tgz&quot;</code> is <code>packages.&quot;${name}-typescript&quot;</code> except
+runs <code>npm pack</code> after the <code>buildPhase</code> to create a tarball of the project in
+the directory <code>$out/tarballs/</code>.</p>
+</li>
+<li>
+<p><code>packages.&quot;${name}-typescript-test&quot;</code> is <code>packages.&quot;${name}-typescript&quot;</code>
+except it runs <code>npm test</code> after the <code>buildPhase</code> succeeding only if <code>npm test</code> succeeds.</p>
+</li>
+</ul>
+<p><em>Type:</em>
+function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
+<p><em>Default:</em>
+<code>&lt;function, args: {devShellHook?, devShellTools?, name, nodejs?, npmBuildScript?, npmExtraDependencies?, src, testTools?}&gt;</code></p>
+<p><em>Declared by:</em></p>
+<ul>
+<li><a href="https://github.com/mlabs-haskell/flake-lang.nix/blob/master/flake-lang/build.nix">flake-lang/build.nix</a></li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
 
-                            <a rel="next prefetch" href="api_reference.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -193,9 +316,6 @@ languages such as Haskell, PureScript, Rust, and TypeScript easier.</p>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
 
-                    <a rel="next prefetch" href="api_reference.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
             </nav>
 
         </div>
@@ -218,6 +338,11 @@ languages such as Haskell, PureScript, Rust, and TypeScript easier.</p>
 
         <!-- Custom JS scripts -->
 
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
 
     </div>
     </body>
