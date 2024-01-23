@@ -7,5 +7,7 @@ _:
     [
       ./haskell-flake-project/build.nix
       ./rust-flake-project/build.nix
+      ./typescript-flake-project/build.nix
+      ./typescript-flake-project-with-extra-dependency/build.nix
     ];
 }

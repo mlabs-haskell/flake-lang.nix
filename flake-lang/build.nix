@@ -20,11 +20,7 @@
       lib = lib.mkOption {
         type = lib.types.lazyAttrsOf (lib.types.lazyAttrsOf (lib.types.functionTo lib.types.attrs));
         default = { };
-        description = ''
-          Nix functions to help create flakes for languages.
-
-          TODO(jaredponn): document this better.
-        '';
+        visible = false;
       };
     };
     perSystem = flake-parts-lib.mkPerSystemOption ({ pkgs, pkgsForCtl, pkgsForHaskellNix, pkgsForRust, ... }: {
@@ -34,10 +30,10 @@
             type = lib.types.functionTo lib.types.attrs;
             default = import ./flake-purescript.nix pkgsForCtl;
             readOnly = true;
-            description = ''
+            description = lib.mdDoc ''
               TODO(jaredponn): write down documentation here
             '';
-            example = ''
+            example = lib.mdDoc ''
               TODO(jaredponn): write down an example here
             '';
           };
@@ -46,10 +42,10 @@
             type = lib.types.functionTo lib.types.attrs;
             default = import ./flake-rust.nix pkgsForRust;
             readOnly = true;
-            description = ''
+            description = lib.mdDoc ''
               TODO(jaredponn): write down documentation here
             '';
-            example = ''
+            example = lib.mdDoc ''
               TODO(jaredponn): write down an example here
             '';
           };
@@ -58,10 +54,10 @@
             type = lib.types.functionTo lib.types.attrs;
             default = import ./flake-haskell.nix pkgsForHaskellNix;
             readOnly = true;
-            description = ''
+            description = lib.mdDoc ''
               TODO(jaredponn): write down documentation here
             '';
-            example = ''
+            example = lib.mdDoc ''
               TODO(jaredponn): write down an example here
             '';
           };
@@ -70,10 +66,10 @@
             type = lib.types.functionTo lib.types.attrs;
             default = import ./flake-haskell-plutus.nix inputs.cardano-haskell-packages pkgsForHaskellNix;
             readOnly = true;
-            description = ''
+            description = lib.mdDoc ''
               TODO(jaredponn): write down documentation here
             '';
-            example = ''
+            example = lib.mdDoc ''
               TODO(jaredponn): write down an example here
             '';
           };
@@ -82,10 +78,10 @@
             type = lib.types.functionTo lib.types.attrs;
             default = import ./flake-typescript.nix pkgs;
             readOnly = true;
-            description = ''
+            description = lib.mdDoc ''
               TODO(jaredponn): write down documentation here
             '';
-            example = ''
+            example = lib.mdDoc ''
               TODO(jaredponn): write down an example here
             '';
           };

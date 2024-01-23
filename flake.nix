@@ -67,6 +67,8 @@
 
         # Examples/Tests
         ./examples/build.nix
+        # Documentation
+        ./docs/build.nix
       ];
     };
 }
