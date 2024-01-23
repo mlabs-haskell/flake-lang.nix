@@ -1,5 +1,8 @@
 # flake-lang.nix
 
-Nix tools to help create flakes for projects
+Nix tools to help create flakes for projects.
 
-See examples [here](./examples/).
+## Documentation
+
+- [API reference](https://mlabs-haskell.github.io/flake-lang.nix/).
+- [Example projects](./examples/).

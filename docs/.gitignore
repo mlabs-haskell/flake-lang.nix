@@ -1,0 +1,4 @@
+book
+result
+# Ignore `src/api_reference.md` since this is built by Nix
+src/api_reference.md

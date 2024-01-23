@@ -1,0 +1,5 @@
+[book]
+authors = ["LambdaBuffers Team"]
+language = "en"
+multilingual = false
+src = "src"

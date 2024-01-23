@@ -2,15 +2,14 @@
   perSystem = { pkgs, config, ... }:
 
     # Note(jaredponn): What is going on here to generate the documentation?
-    # Since flake-parts is using the module system and nixos also uses the
-    # module system, we copy how they generate documentation:
-    #  - The nix function which builds the documentation 
+    # Since flake-parts is using the module system, and NixOS also uses the
+    # module system; we copy how NixOS generates their documentation:
+    #  [1] The Nix function which builds the documentation returning an attribute
+    #    set of a bunch of goodies:
     #    https://github.com/NixOS/nixpkgs/blob/master/nixos/lib/make-options-doc/default.nix
-    #  - The file where they actually build the documentation
+    #  [2] The file where NixOS builds its own documentation:
     #    https://github.com/NixOS/nixpkgs/blob/master/doc/default.nix
     let
-      # TODO(jaredponn): make this a module option or something so someone
-      # can set this somewhere else...
       rootSrcUrl = "https://github.com/mlabs-haskell/flake-lang.nix/blob/master";
       eval =
         # pkgs.lib.evalModules
@@ -25,7 +24,6 @@
       optionsDoc = pkgs.nixosOptionsDoc {
         inherit (eval) options;
         documentType = "none";
-        revision = "none";
         # We only want to include the options provided by us (there's a
         # bunch of extra garbage provided by flake-parts).
         # So, we set the attribute `.visible` to `false` for all options
@@ -73,23 +71,53 @@
     {
 
       packages = {
-        # Useful for debugging.
-        docs-raw-json = optionsDoc.optionsJSON;
-        docs-raw-common-mark = optionsDoc.optionsCommonMark;
+        # Documentation outputs produced from [1]
+        options-doc-json = optionsDoc.optionsJSON;
+        options-doc-common-mark = optionsDoc.optionsCommonMark;
 
         # Documentation
-        docs = pkgs.runCommand
-          "flake-lang-docs"
-          { nativeBuildInputs = [ pkgs.pandoc ]; }
-          ''
-            pandoc ${pkgs.lib.escapeShellArg config.packages.docs-raw-common-mark} \
-                --metadata title="flake-lang.nix" \
-                --standalone \
-                --output index.html
+        docs = pkgs.stdenv.mkDerivation {
+          name = "flake-lang-docs";
+          nativeBuildInputs = [ pkgs.mdbook ];
 
-            mkdir -p "$out"
-            mv index.html "$out"
-          '';
+          src = ./.;
+
+          OPTIONS_DOC_COMMON_MARK = config.packages.options-doc-common-mark;
+
+          configurePhase =
+            ''
+              # Provide a command for linking `$OPTIONS_DOC_COMMON_MARK`
+              # for use when in a developer shell.
+              link-options-doc-common-mark() {
+                  2>&1 echo "link-options-doc-common-mark: creating a symbolic link named \`./src/api_reference.md\` pointing to \`\$OPTIONS_DOC_COMMON_MARK\`"
+                  ln -sf ${pkgs.lib.escapeShellArg config.packages.options-doc-common-mark} ./src/api_reference.md
+              }
+
+              link-options-doc-common-mark
+            '';
+
+          buildPhase =
+            ''
+              mdbook build --dest-dir book
+            '';
+
+          installPhase =
+            ''
+              mkdir -p "$out"
+              mv book/* "$out"
+            '';
+        };
+      };
+
+      devShells = {
+        docs = config.packages.docs.overrideAttrs (_self: super:
+          {
+            shellHook =
+              ''
+                ${super.configurePhase}
+              '';
+          }
+        );
       };
     };
 }
