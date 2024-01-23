@@ -251,7 +251,7 @@ pkgs.lib.makeExtensible
 
             export NODE_PATH=${pkgs.lib.escapeShellArg "${npmPackage}/lib/node_modules/${srcWithNode2nixIfd.args.packageName}/node_modules"}
 
-            echo 'Removing existing `node_modules`, and creating a symbolic link to `$NODE_PATH` with name `node_modules`...'
+            echo 'Removing existing `node_modules`, and creating a symbolic link named `node_modules` pointing to `$NODE_PATH`'
             rm -rf node_modules
             ln -sf "$NODE_PATH" node_modules
 

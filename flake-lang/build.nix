@@ -76,14 +76,11 @@
 
           typescriptFlake = lib.mkOption {
             type = lib.types.functionTo lib.types.attrs;
-            default = import ./flake-typescript.nix pkgs;
+            default = import ./typescript/flake-typescript.nix pkgs;
             readOnly = true;
-            description = lib.mdDoc ''
-              TODO(jaredponn): write down documentation here
-            '';
-            example = lib.mdDoc ''
-              TODO(jaredponn): write down an example here
-            '';
+            description = lib.mdDoc builtins.readFile ./typescript/description.md;
+            # TODO(jaredponn): add an example
+            # example = lib.mdDoc '' '';
           };
 
         };
