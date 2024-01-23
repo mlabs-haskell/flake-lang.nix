@@ -113,7 +113,7 @@ in
   checks = {
     "${crateName}-rust-test" = craneLib.cargoNextest (commonArgs // {
       inherit cargoArtifacts;
-      nativeBuildInputs = testTools;
+      nativeBuildInputs = testTools ++ nativeBuildInputs;
     });
 
     "${crateName}-rust-clippy" = craneLib.cargoClippy (commonArgs // {
