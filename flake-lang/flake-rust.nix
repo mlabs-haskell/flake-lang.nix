@@ -90,7 +90,7 @@ in
 {
   devShells."dev-${crateName}-rust" = craneLib.devShell {
     buildInputs = nativeBuildInputs;
-    packages = devShellTools;
+    packages = devShellTools ++ testTools;
     shellHook = ''
       ${linkExtraSources}
       ${linkData}
@@ -113,7 +113,7 @@ in
   checks = {
     "${crateName}-rust-test" = craneLib.cargoNextest (commonArgs // {
       inherit cargoArtifacts;
-      nativeBuildInputs = testTools;
+      nativeBuildInputs = testTools ++ nativeBuildInputs;
     });
 
     "${crateName}-rust-clippy" = craneLib.cargoClippy (commonArgs // {
