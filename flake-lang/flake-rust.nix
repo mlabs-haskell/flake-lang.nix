@@ -13,6 +13,7 @@ pkgs:
 , devShellHook ? ""
 , devShellTools ? [ ]
 , testTools ? [ ]
+, cargoNextestExtraArgs ? ""
 }:
 let
   rustWithTools = pkgs.rust-bin.stable.${rustVersion}.default.override {
@@ -113,7 +114,7 @@ in
 
   checks = {
     "${crateName}-rust-test" = craneLib.cargoNextest (commonArgs // {
-      inherit cargoArtifacts;
+      inherit cargoArtifacts cargoNextestExtraArgs;
       nativeBuildInputs = testTools ++ nativeBuildInputs;
     });
 
