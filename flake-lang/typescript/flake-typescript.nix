@@ -120,7 +120,7 @@ pkgs.lib.makeExtensible
 
             if ! node2nix --input ./package.json --lock ./package-lock.json --development --node-env "$NIX_NODE_ENV_FILE" --output "$NIX_NODE_PACKAGES_FILE" --composition "$NIX_COMPOSITION_FILE"
             then
-                1>&2 echo 'ERROR: `node2nix` failed.'
+                1>&2 echo 'flake-lang.nix: error: `node2nix` failed.'
                 1>&2 echo 'Some of the following may fix your problem:'
                 1>&2 echo '   - (Re)create a `./package-lock.json` with lockfile version 2 by running:'
                 1>&2 echo '          npm install --package-lock-only --lockfile-version 2          '
@@ -251,8 +251,10 @@ pkgs.lib.makeExtensible
 
             export NODE_PATH=${pkgs.lib.escapeShellArg "${npmPackage}/lib/node_modules/${srcWithNode2nixIfd.args.packageName}/node_modules"}
 
-            echo 'Removing existing `node_modules`, and creating a symbolic link named `node_modules` pointing to `$NODE_PATH`'
+            [[ -e node_modules ]] && echo 'flake-lang.nix: removing existing `node_modules`'
             rm -rf node_modules
+
+            echo 'flake-lang.nix: creating a symbolic link named `node_modules` pointing to `$NODE_PATH`'
             ln -sf "$NODE_PATH" node_modules
 
             ${devShellHook}
