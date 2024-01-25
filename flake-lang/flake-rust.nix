@@ -5,6 +5,7 @@ pkgs:
 , crateName
 , rustVersion ? "latest"
 , nativeBuildInputs ? [ ]
+, buildInputs ? [ ]
 , extraSources ? [ ]
 , extraSourcesDir ? ".extras"
 , data ? [ ]
@@ -12,6 +13,7 @@ pkgs:
 , devShellHook ? ""
 , devShellTools ? [ ]
 , testTools ? [ ]
+, cargoNextestExtraArgs ? ""
 }:
 let
   rustWithTools = pkgs.rust-bin.stable.${rustVersion}.default.override {
@@ -53,7 +55,7 @@ let
       };
 
   commonArgs = {
-    inherit nativeBuildInputs;
+    inherit nativeBuildInputs buildInputs;
     src = buildEnv;
     pname = crateName;
     strictDeps = true;
@@ -89,7 +91,7 @@ let
 in
 {
   devShells."dev-${crateName}-rust" = craneLib.devShell {
-    buildInputs = nativeBuildInputs;
+    buildInputs = buildInputs ++ nativeBuildInputs;
     packages = devShellTools ++ testTools;
     shellHook = ''
       ${linkExtraSources}
@@ -112,7 +114,7 @@ in
 
   checks = {
     "${crateName}-rust-test" = craneLib.cargoNextest (commonArgs // {
-      inherit cargoArtifacts;
+      inherit cargoArtifacts cargoNextestExtraArgs;
       nativeBuildInputs = testTools ++ nativeBuildInputs;
     });
 
