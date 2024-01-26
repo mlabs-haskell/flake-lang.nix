@@ -38,6 +38,16 @@ pkgs:
 , # `testTools` are extra derivations to append to the `buildInputs` for
   # the tests (see the variable `test`)
   testTools ? [ ]
+, # Extra data to include in the project `${name}-typescript` in the directory
+  # `dataDir`.
+  # Type is:
+  #     - List of attribute sets like:
+  #         [ { name = "name"; path = "/nix/store/..."; } ]
+  # Internally, this uses `pkgs.linkFarm`.
+  data ? [ ]
+, # Name of the directory to put `data` in.
+  dataDir ? "data"
+,
 }:
 pkgs.lib.makeExtensible
   (self: with self.__typescriptFlake__;
@@ -59,6 +69,35 @@ pkgs.lib.makeExtensible
       npmExtraDependenciesFolder = "./extra-dependencies";
 
 
+      # Creates something like
+      #  /nix/store/....-${name}-data
+      #  |-- foobar -> /nix/store/...
+      #  `-- hello-test -> /nix/store/...
+      #  see `pkgs.linkFarm` (a trivial builder) for details
+      dataLinkFarm = pkgs.linkFarm "${name}-data" data;
+
+      # Directory to put the `data` in
+      dataFolder = dataDir;
+
+      # Shell script to create the dataLinkFarm in the directory `dataDir`.
+      dataLinkFarmCmd =
+        let cmdName = "${name}-data";
+        in pkgs.writeShellApplication rec {
+          name = cmdName;
+          runtimeInputs = [ ];
+          text =
+            ''
+              printf "flake-lang.nix: %s: copying \`%s/.\` to \`%s\`\n" \
+                  ${pkgs.lib.escapeShellArg name} \
+                  ${pkgs.lib.escapeShellArg dataLinkFarm} \
+                  ${pkgs.lib.escapeShellArg dataFolder}
+
+              cp -Lr ${pkgs.lib.escapeShellArg dataLinkFarm} \
+                  ${pkgs.lib.escapeShellArg dataFolder}
+
+              chmod -R "=755" ${pkgs.lib.escapeShellArg dataFolder}
+            '';
+        };
 
       # Creates a nix derivation with all the extra npm dependencies provided
       # by nix.
@@ -85,7 +124,10 @@ pkgs.lib.makeExtensible
           name = cmdName;
           runtimeInputs = [ ];
           text = ''
-            printf "%s: copying \`%s/.\` to \`%s\`\n" ${pkgs.lib.escapeShellArg name} ${pkgs.lib.escapeShellArg mkNpmExtraDependencies} ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
+            printf "flake-lang.nix: %s: copying \`%s/.\` to \`%s\`\n" \
+                ${pkgs.lib.escapeShellArg name} \
+                ${pkgs.lib.escapeShellArg mkNpmExtraDependencies} \
+                ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
 
             cp -r ${pkgs.lib.escapeShellArg mkNpmExtraDependencies}/. ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
 
@@ -100,12 +142,13 @@ pkgs.lib.makeExtensible
       srcWithNode2nix = pkgs.stdenv.mkDerivation {
         name = "${name}-node2nix";
         inherit src;
-        buildInputs = [ pkgs.node2nix nodejs mkNpmExtraDependenciesCmd ];
+        buildInputs = [ pkgs.node2nix nodejs mkNpmExtraDependenciesCmd dataLinkFarmCmd ];
         configurePhase =
           ''
             runHook preConfigure
 
             ${pkgs.lib.escapeShellArg mkNpmExtraDependenciesCmd.name}
+            ${pkgs.lib.escapeShellArg dataLinkFarmCmd.name}
 
             runHook postConfigure
           '';
@@ -243,11 +286,13 @@ pkgs.lib.makeExtensible
       };
 
       shell = pkgs.mkShell {
-        packages = [ nodejs mkNpmExtraDependenciesCmd ] ++ devShellTools;
+        packages = [ nodejs mkNpmExtraDependenciesCmd dataLinkFarmCmd ] ++ devShellTools;
 
         shellHook =
           ''
             ${pkgs.lib.escapeShellArg mkNpmExtraDependenciesCmd.name}
+
+            ${pkgs.lib.escapeShellArg dataLinkFarmCmd.name}
 
             export NODE_PATH=${pkgs.lib.escapeShellArg "${npmPackage}/lib/node_modules/${srcWithNode2nixIfd.args.packageName}/node_modules"}
 
