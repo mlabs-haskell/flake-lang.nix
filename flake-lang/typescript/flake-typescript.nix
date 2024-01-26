@@ -286,11 +286,13 @@ pkgs.lib.makeExtensible
       };
 
       shell = pkgs.mkShell {
-        packages = [ nodejs mkNpmExtraDependenciesCmd ] ++ devShellTools;
+        packages = [ nodejs mkNpmExtraDependenciesCmd dataLinkFarmCmd ] ++ devShellTools;
 
         shellHook =
           ''
             ${pkgs.lib.escapeShellArg mkNpmExtraDependenciesCmd.name}
+
+            ${pkgs.lib.escapeShellArg dataLinkFarmCmd.name}
 
             export NODE_PATH=${pkgs.lib.escapeShellArg "${npmPackage}/lib/node_modules/${srcWithNode2nixIfd.args.packageName}/node_modules"}
 
