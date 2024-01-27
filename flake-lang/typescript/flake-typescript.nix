@@ -362,6 +362,34 @@ pkgs.lib.makeExtensible
 
       };
 
+      # Runs `npm install --global --prefix="$out"` for the `project`, and
+      # "patches" the symlinks s.t. they reference valid data.
+      npmExe = project.overrideAttrs (_self: _super:
+        {
+          installPhase =
+            ''
+              npm install \
+                  --global \
+                  --prefix="$out"
+
+              # By [1], we know that the packages will be installed in
+              #     - `$out/lib/node_modules`, 
+              #     - the bins / man pages will be linked to `$out/bin` and
+              #     `$out/share/man`
+              # So, we will copy `$out/lib/node_modules`s over, and the bins /
+              # mans will already point to the copied over
+              # `$out/lib/node_modules`.
+              #
+              # References:
+              #     [1] https://docs.npmjs.com/cli/v8/commands/npm-install#global
+
+              # Copy the lib over
+              find "$out/lib/node_modules" -type l -execdir \
+                  sh -c '{ DEREF="$(realpath -e "$1")"; rm -rf "$1" && cp -r "$DEREF" "$1" ; }' resolve-symbolic-link '{}' \;
+            '';
+        }
+      );
+
       # Creates a tarball of `project` using `npm pack` and puts it in the nix
       # store.
       npmPack = project.overrideAttrs (_self: _super:
@@ -418,6 +446,7 @@ pkgs.lib.makeExtensible
 
     packages = {
       "${name}-typescript" = project;
+      "${name}-typescript-exe" = npmExe;
       "${name}-typescript-tgz" = npmPack;
       "${name}-typescript-node2nix" = srcWithNode2nix;
     };

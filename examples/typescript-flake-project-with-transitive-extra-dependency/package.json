@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Typescript flake project with a transitive extra dependency",
   "lockfileVersion": 2,
+  "bin": {
+    "typescript-flake-project-with-transitive-extra-dependency": "./bin/typescript-flake-project-with-transitive-extra-dependency.js"
+  },
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json"

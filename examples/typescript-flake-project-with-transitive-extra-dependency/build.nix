@@ -1,6 +1,6 @@
 { ... }:
 {
-  perSystem = { config, ... }:
+  perSystem = { pkgs, config, ... }:
     let
       typescriptFlake =
         config.lib.typescriptFlake {
@@ -17,11 +17,25 @@
       packages = {
         inherit (typescriptFlake.packages)
           typescript-flake-project-with-transitive-extra-dependency-typescript
+          typescript-flake-project-with-transitive-extra-dependency-typescript-exe
           typescript-flake-project-with-transitive-extra-dependency-typescript-tgz
           typescript-flake-project-with-transitive-extra-dependency-typescript-node2nix;
       };
 
-      inherit (typescriptFlake) checks devShells;
-    };
+      inherit (typescriptFlake) devShells;
 
+      checks = {
+        inherit (typescriptFlake.checks) typescript-flake-project-with-transitive-extra-dependency-typescript-test;
+
+        # Quick derivation to verify that the executable (see the `bin` key of
+        # `package.json`) really works.
+        typescript-flake-project-with-transitive-extra-dependency-typescript-valid-exe =
+          pkgs.runCommand "typescript-flake-project-with-transitive-extra-dependency-typescript-valid-exe"
+            { buildInputs = [ config.packages.typescript-flake-project-with-transitive-extra-dependency-typescript-exe ]; }
+            ''
+              typescript-flake-project-with-transitive-extra-dependency
+              touch "$out"
+            '';
+      };
+    };
 }
