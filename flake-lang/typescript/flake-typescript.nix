@@ -47,7 +47,6 @@ pkgs:
   data ? [ ]
 , # Name of the directory to put `data` in.
   dataDir ? "data"
-,
 }:
 pkgs.lib.makeExtensible
   (self: with self.__typescriptFlake__;
@@ -66,8 +65,15 @@ pkgs.lib.makeExtensible
       # Folder to put the extra dependencies in
       # WARNING: we have to be a bit careful about this -- the `package.json`'s
       # expect the dependencies to be put in a specific folder.
-      npmExtraDependenciesFolder = "./extra-dependencies";
-
+      # NOTE(jaredponn): Why does this start with a `.`? This is because 
+      #     1. It makes it a hidden file
+      #     2. This no longer becomes a valid package name according to these
+      #     guys:
+      #     https://www.npmjs.com/package/validate-npm-package-name#naming-rules,
+      #     so we can safely put all of our extra dependencies in this folder
+      #     without running into troubles with node2nix later (see
+      #     `extraDependenciesForNode2nix`)
+      npmExtraDependenciesFolder = "./.extra-dependencies";
 
       # Creates something like
       #  /nix/store/....-${name}-data
@@ -87,15 +93,21 @@ pkgs.lib.makeExtensible
           runtimeInputs = [ ];
           text =
             ''
-              printf "flake-lang.nix: %s: copying \`%s/.\` to \`%s\`\n" \
+              printf "flake-lang.nix: %s: creating a symbolic link named \`%s\` pointing to \`%s\`\n" \
                   ${pkgs.lib.escapeShellArg name} \
-                  ${pkgs.lib.escapeShellArg dataLinkFarm} \
-                  ${pkgs.lib.escapeShellArg dataFolder}
+                  ${pkgs.lib.escapeShellArg dataFolder} \
+                  ${pkgs.lib.escapeShellArg dataLinkFarm}
 
-              cp -Lr ${pkgs.lib.escapeShellArg dataLinkFarm} \
-                  ${pkgs.lib.escapeShellArg dataFolder}
 
-              chmod -R "=755" ${pkgs.lib.escapeShellArg dataFolder}
+              [[ -e ${pkgs.lib.escapeShellArg dataFolder} ]] && \
+                  printf "flake-lang.nix: %s: removing existing \`%s\`\n" \
+                      ${pkgs.lib.escapeShellArg name} \
+                      ${pkgs.lib.escapeShellArg dataFolder}
+
+              rm -rf ${pkgs.lib.escapeShellArg dataFolder}
+
+              ln -sf ${pkgs.lib.escapeShellArg dataLinkFarm} \
+                  ${pkgs.lib.escapeShellArg dataFolder}
             '';
         };
 
@@ -113,7 +125,7 @@ pkgs.lib.makeExtensible
             mkdir -p $out
             cd $out
 
-            ${builtins.concatStringsSep "\n" (builtins.map (dep: ''cp -r --update=none "${dep}/tarballs/"* .'') npmExtraDependenciesTransitiveClosure)}
+            ${builtins.concatStringsSep "\n" (builtins.map (dep: ''ln -sf ${pkgs.lib.escapeShellArg dep}/tarballs/* .'') npmExtraDependenciesTransitiveClosure)}
           '';
 
       # Shell script to create the dependencies copied in `npmExtraDependenciesTransitiveClosure`.
@@ -124,16 +136,19 @@ pkgs.lib.makeExtensible
           name = cmdName;
           runtimeInputs = [ ];
           text = ''
-            printf "flake-lang.nix: %s: copying \`%s/.\` to \`%s\`\n" \
+            printf "flake-lang.nix: %s: creating a symbolic link named \`%s\` pointing to \`%s\`\n" \
                 ${pkgs.lib.escapeShellArg name} \
-                ${pkgs.lib.escapeShellArg mkNpmExtraDependencies} \
+                ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder} \
+                ${pkgs.lib.escapeShellArg mkNpmExtraDependencies}
+
+              [[ -e ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder} ]] && \
+                  printf "flake-lang.nix: %s: removing existing \`%s\`\n" \
+                    ${pkgs.lib.escapeShellArg name} \
+                    ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
+
+            rm -rf ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
+            ln -sf ${pkgs.lib.escapeShellArg mkNpmExtraDependencies} \
                 ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
-
-            cp -r ${pkgs.lib.escapeShellArg mkNpmExtraDependencies}/. ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
-
-            # Give the directory sane permissions so users can delete it w/o
-            # sudo
-            chmod -R "=755" ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
           '';
         };
 
@@ -143,6 +158,7 @@ pkgs.lib.makeExtensible
         name = "${name}-node2nix";
         inherit src;
         buildInputs = [ pkgs.node2nix nodejs mkNpmExtraDependenciesCmd dataLinkFarmCmd ];
+
         configurePhase =
           ''
             runHook preConfigure
@@ -192,17 +208,53 @@ pkgs.lib.makeExtensible
       # ```
       # $out/lib/node_modules/${srcWithNode2nixIfd.args.packageName}/node_modules
       # ```
-      npmPackage = srcWithNode2nixIfd.package.override
+      npmPackage = srcWithNode2nixIfd.package.override (super:
         {
-          # Ensures that the node_modules has the extra linked dependencies when
-          # building it.
-          preRebuild =
+          # NOTE(jaredponn): Some hacks to get around restricted mode when
+          # building the derivation in CI.. Namely, it doesn't like the
+          # canonical (absolute) paths that node2nix generates when accessing
+          # the local dependencies, so we overrwrite those as strings so that
+          # they become the relative path in `npmExtraDependenciesFolder`
+          # TODO(jaredponn): we really should be more precise about how we
+          # decide what is a folder dependency provided by nix instead  of just
+          # checking if the src is a path
+          # NOTE(jaredponn): Why are we adding the extra dependencies + the
+          # data to `postConfigure` in $TMPDIR (with
+          # `extraDependenciesForNode2nix`)? This is because of the way
+          # node2nix works... when it installs a package, it goes to $TMPDIR,
+          # THEN it installs the package.. so to ensure that all of our
+          # dependencies are available, we link everything there for
+          # `node2nix`.
+          buildInputs = super.buildInputs ++ [ mkNpmExtraDependenciesCmd dataLinkFarmCmd ];
+          dependencies = builtins.map
+            (dep:
+              if builtins.typeOf dep.src == "path"
+              then dep // { src = pkgs.lib.path.removePrefix srcWithNode2nixIfd.args.src dep.src; }
+              else dep
+            )
+            (super.dependencies);
+          postConfigure =
             ''
-              ${pkgs.lib.escapeShellArg "${mkNpmExtraDependenciesCmd}/bin/${mkNpmExtraDependenciesCmd.name}"}
+              extraDependenciesForNode2nix( ) {
+                local DIR
+
+                DIR="$(pwd)"
+                cd "$TMPDIR"
+
+                ${pkgs.lib.escapeShellArg mkNpmExtraDependenciesCmd.name}
+                ${pkgs.lib.escapeShellArg dataLinkFarmCmd.name}
+
+                cd "$DIR"
+              }
+
+              extraDependenciesForNode2nix
             '';
 
-          # TODO(jaredponn): Wow this is horrible. `npm install` is broken for
-          # local dependencies on the filesystem. I think something like the
+          # NOTE(jaredponn): This note has been mostly resolved, but we leave
+          # it here for historical purposes for why we used to remove the `package-lock.json`.
+          #
+          # Wow this is horrible. `npm install` is broken for local
+          # dependencies on the filesystem. I think something like the
           # following is problematic:
           # - Suppose A is a tarball and depends on tarball B
           # - Assume that we have a "sensible" `package.json` and
@@ -214,11 +266,14 @@ pkgs.lib.makeExtensible
           # it from scratch I guess?
           # This _should_ still be "reproducible" as `nix` has provided all
           # dependencies...
-          postRebuild =
-            ''
-              rm package-lock.json
-            '';
-        };
+          # ```
+          # postRebuild =
+          #   ''
+          #     rm package-lock.json
+          #   '';
+          # ```
+        })
+      ;
 
       # Build the project (runs `npm run build`)
       # This derivation is intended to have an overlay to do something useful
@@ -236,7 +291,7 @@ pkgs.lib.makeExtensible
         # override srcWithNode2nix's source as the "root source" of all of the
         # following derivations.
         src = srcWithNode2nix;
-        buildInputs = [ nodejs ];
+        buildInputs = [ nodejs mkNpmExtraDependenciesCmd dataLinkFarmCmd ];
 
         # `npmExtraDependencies` is used for Nix to gather all the transitive
         # dependencies so the user doesn't have to manually specify all the
@@ -307,6 +362,34 @@ pkgs.lib.makeExtensible
 
       };
 
+      # Runs `npm install --global --prefix="$out"` for the `project`, and
+      # "patches" the symlinks s.t. they reference valid data.
+      npmExe = project.overrideAttrs (_self: _super:
+        {
+          installPhase =
+            ''
+              npm install \
+                  --global \
+                  --prefix="$out"
+
+              # By [1], we know that the packages will be installed in
+              #     - `$out/lib/node_modules`, 
+              #     - the bins / man pages will be linked to `$out/bin` and
+              #     `$out/share/man`
+              # So, we will copy `$out/lib/node_modules`s over, and the bins /
+              # mans will already point to the copied over
+              # `$out/lib/node_modules`.
+              #
+              # References:
+              #     [1] https://docs.npmjs.com/cli/v8/commands/npm-install#global
+
+              # Copy the lib over
+              find "$out/lib/node_modules" -type l -execdir \
+                  sh -c '{ DEREF="$(realpath -e "$1")"; rm -rf "$1" && cp -r "$DEREF" "$1" ; }' resolve-symbolic-link '{}' \;
+            '';
+        }
+      );
+
       # Creates a tarball of `project` using `npm pack` and puts it in the nix
       # store.
       npmPack = project.overrideAttrs (_self: _super:
@@ -314,6 +397,26 @@ pkgs.lib.makeExtensible
           name = "${name}-tarball";
           installPhase =
             ''
+              TMPFILE=$(mktemp)
+
+              # NOTE(jaredponn): the following commands are used to ensure that
+              # the `.extra-dependencies` get copied in the resulting tarball
+              # so `npm` can find it later when trying to e.g. install things.
+              # TODO(jaredponn): This should blow up pretty quick in terms of
+              # space complexity -- assuming we have V dependencies which form
+              # a tree, since each dependency must contain all of its
+              # transitive closure of dependencies, we see that this gives  a
+              # bound of O(V^3) copied files.
+              # A better solution would be to symlink stuff inside the tarballs
+              # / find a way to tell npm that the dependencies are in the root
+              # directory in `./.extra-dependencies/*`
+              if [ -e ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder} ]
+              then
+                  mv -f ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder} "$TMPFILE"
+                  rm -rf .gitignore # otherwise, `npm` will ignore the `.extra-dependencies`
+                  cp -Lr "$TMPFILE" ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
+              fi
+
               mkdir -p "$out/tarballs"
               npm pack --pack-destination "$out/tarballs"
             '';
@@ -346,6 +449,7 @@ pkgs.lib.makeExtensible
 
     packages = {
       "${name}-typescript" = project;
+      "${name}-typescript-exe" = npmExe;
       "${name}-typescript-tgz" = npmPack;
       "${name}-typescript-node2nix" = srcWithNode2nix;
     };

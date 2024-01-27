@@ -9,6 +9,7 @@ Returns an attribute set of the form
 {
   devShells."${name}-typescript" = derivation { ... };
   packages."${name}-typescript" = derivation { ... };
+  packages."${name}-typescript-exe" = derivation { ... };
   packages."${name}-typescript-tgz" = derivation { ... };
   packages."${name}-typescript-node2nix" = derivation { ... };
   checks."${name}-typescript-test" = derivation { ... };
@@ -50,6 +51,10 @@ where
       - create a symbolic link named `node_modules` pointing to
         `$NODE_PATH`; and
       - executes `${name}-npm-extra-dependencies`.
+
+- `packages."${name}-typescript-exe"` is `packages."${name}-typescript"` except
+  runs `npm install --global --prefix="$out"` for the `installPhase` and
+  copies some of the symbolic links so that the output makes sense.
 
 - `packages."${name}-typescript-tgz"` is `packages."${name}-typescript"` except
   runs `npm pack` after the `buildPhase` to create a tarball of the project in

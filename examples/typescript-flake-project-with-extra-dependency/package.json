@@ -1,7 +1,7 @@
 {
-  "name": "typescript-flake-sample-project-with-extra-dependency",
+  "name": "typescript-flake-project-with-extra-dependency",
   "version": "1.0.0",
-  "description": "Typescript flake sample project with an extra dependency",
+  "description": "Typescript flake project with an extra dependency",
   "lockfileVersion": 2,
   "exports": {
     ".": "./dist/index.js",
@@ -18,11 +18,12 @@
   },
   "author": "Jared Pon",
   "license": "ISC",
-  "files": [
-    "./dist/**/*"
-  ],
+  "files": 
+    [ "./dist/**/*"
+    , "./.extra-dependencies/**/*"
+    ],
   "dependencies": {
     "typescript": "^5.3.3",
-    "typescript-flake-project": "file:extra-dependencies/typescript-flake-project-1.0.0.tgz"
+    "typescript-flake-project": "file:.extra-dependencies/typescript-flake-project-1.0.0.tgz"
   }
 }

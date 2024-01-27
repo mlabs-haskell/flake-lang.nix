@@ -1,0 +1,33 @@
+{
+  "name": "typescript-flake-project-with-transitive-extra-dependency",
+  "version": "1.0.0",
+  "description": "Typescript flake project with a transitive extra dependency",
+  "lockfileVersion": 2,
+  "bin": {
+    "typescript-flake-project-with-transitive-extra-dependency": "./bin/typescript-flake-project-with-transitive-extra-dependency.js"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "npx tsc -b src",
+    "test": ":"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mlabs-haskell/flake-lang.nix"
+  },
+  "author": "Jared Pon",
+  "license": "ISC",
+  "files": [
+    "./dist/**/*",
+    "./.extra-dependencies/**/*"
+  ],
+  "dependencies": {
+    "typescript": "^5.3.3",
+    "typescript-flake-project": "file:.extra-dependencies/typescript-flake-project-1.0.0.tgz",
+    "typescript-flake-project-with-extra-dependency": "file:.extra-dependencies/typescript-flake-project-with-extra-dependency-1.0.0.tgz"
+  }
+}
