@@ -243,6 +243,7 @@ function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
 <pre><code class="language-nix">{
   devShells.&quot;${name}-typescript&quot; = derivation { ... };
   packages.&quot;${name}-typescript&quot; = derivation { ... };
+  packages.&quot;${name}-typescript-exe&quot; = derivation { ... };
   packages.&quot;${name}-typescript-tgz&quot; = derivation { ... };
   packages.&quot;${name}-typescript-node2nix&quot; = derivation { ... };
   checks.&quot;${name}-typescript-test&quot; = derivation { ... };
@@ -283,6 +284,11 @@ closure of <code>npmExtraDependencies</code> to the folder <code>./extra-depende
 <code>$NODE_PATH</code>; and</li>
 <li>executes <code>${name}-npm-extra-dependencies</code>.</li>
 </ul>
+</li>
+<li>
+<p><code>packages.&quot;${name}-typescript-exe&quot;</code> is <code>packages.&quot;${name}-typescript&quot;</code> except
+runs <code>npm install --global --prefix=&quot;$out&quot;</code> for the <code>installPhase</code> and
+copies some of the symbolic links so that the output makes sense.</p>
 </li>
 <li>
 <p><code>packages.&quot;${name}-typescript-tgz&quot;</code> is <code>packages.&quot;${name}-typescript&quot;</code> except
