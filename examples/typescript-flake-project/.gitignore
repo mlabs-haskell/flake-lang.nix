@@ -1,3 +1,8 @@
+# Nix generated files
+data
+.extra-dependencies
+node_modules
+
 # Logs
 logs
 *.log
