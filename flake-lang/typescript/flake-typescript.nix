@@ -410,9 +410,12 @@ pkgs.lib.makeExtensible
               # A better solution would be to symlink stuff inside the tarballs
               # / find a way to tell npm that the dependencies are in the root
               # directory in `./.extra-dependencies/*`
-              mv -f ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder} "$TMPFILE"
-              rm -rf .gitignore # otherwise, `npm` will ignore the `.extra-dependencies`
-              cp -Lr "$TMPFILE" ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
+              if [ -e ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder} ]
+              then
+                  mv -f ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder} "$TMPFILE"
+                  rm -rf .gitignore # otherwise, `npm` will ignore the `.extra-dependencies`
+                  cp -Lr "$TMPFILE" ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
+              fi
 
               mkdir -p "$out/tarballs"
               npm pack --pack-destination "$out/tarballs"
