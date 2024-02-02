@@ -1,4 +1,4 @@
-# Makes a Cabal package with just a 'data' directory with proper 'data-filers' stanza
+# Makes a Cabal package with just a 'data' directory with proper 'data-files' stanza
 pkgs: { srcs, cabalDataPatterns, cabalPackageName, cabalPackageVersion ? "0.1.0.0" }:
 let
   cabalTemplate = pkgs.writeTextFile {
