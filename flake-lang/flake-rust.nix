@@ -45,7 +45,7 @@ let
     pkgs.stdenv.mkDerivation
       {
         src = cleanSrc;
-        name = "${crateName}-vendored-src";
+        name = crateName;
         unpackPhase = ''
           mkdir $out
           cp -r $src/* $out
@@ -63,7 +63,7 @@ let
   cargoArtifacts = craneLib.buildDepsOnly commonArgs;
 
   # Extra sources
-  extra-sources = pkgs.linkFarm "extra-sources" extraSources;
+  extra-sources = pkgs.linkFarm "extra-sources" (builtins.map (drv: { name = drv.name; path = drv; }) extraSources);
 
   hasExtraSources = builtins.length extraSources > 0;
   linkExtraSources = pkgs.lib.optionalString hasExtraSources ''
