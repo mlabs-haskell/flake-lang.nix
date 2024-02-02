@@ -6,7 +6,11 @@
         {
           src = ./.;
           inherit (inputs) crane;
-          crateName = "rust-flake-project";
+          crateName = "rust-flake-project-with-extra-dependency";
+
+          extraSources = [
+            config.packages.rust-flake-project-rust-src
+          ];
 
           devShellHook = config.settings.shell.hook;
 
