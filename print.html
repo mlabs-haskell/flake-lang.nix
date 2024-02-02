@@ -177,7 +177,28 @@
                         <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
 <p>This library provides a set of Nix functions to make creating flakes for
 languages such as Haskell, PureScript, Rust, and TypeScript easier.</p>
-<div style="break-before: page; page-break-before: always;"></div><h2 id="persystemlibhaskellflake"><a class="header" href="#persystemlibhaskellflake">perSystem.lib.haskellFlake</a></h2>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="persystemlibhaskelldata"><a class="header" href="#persystemlibhaskelldata">perSystem.lib.haskellData</a></h2>
+<p>Makes a derivation containing a Haskell Cabal package with data modules (using Cabal data stanzas)</p>
+<p><em>Type:</em>
+function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
+<p><em>Default:</em>
+<code>&lt;function, args: {cabalDataPatterns, cabalPackageName, cabalPackageVersion?, srcs}&gt;</code></p>
+<p><em>Example:</em></p>
+<pre><code>''
+  ```haskell
+    haskellData {
+      srcs = [ ./. ];
+      cabalDataPatterns = [ &quot;**/*.json&quot; ];
+      cabalPackageName = &quot;golden-json-data&quot;;
+    };
+  ```
+''
+</code></pre>
+<p><em>Declared by:</em></p>
+<ul>
+<li><a href="https://github.com/mlabs-haskell/flake-lang.nix/blob/master/flake-lang/build.nix">flake-lang/build.nix</a></li>
+</ul>
+<h2 id="persystemlibhaskellflake"><a class="header" href="#persystemlibhaskellflake">perSystem.lib.haskellFlake</a></h2>
 <p>TODO(jaredponn): write down documentation here</p>
 <p><em>Type:</em>
 function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
