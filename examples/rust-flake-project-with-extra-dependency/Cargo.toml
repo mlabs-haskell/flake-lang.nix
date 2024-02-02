@@ -6,4 +6,4 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rust-flake-project = { path = ".extras/rust-flake-project" }
+rust-flake-project = { path = ".extras/rust-flake-project-0.1.0" }

@@ -3,6 +3,7 @@ pkgs:
 { crane
 , src
 , crateName
+, version ? "0.1.0"
 , rustVersion ? "latest"
 , nativeBuildInputs ? [ ]
 , buildInputs ? [ ]
@@ -38,14 +39,14 @@ let
         '';
       };
 
-  # Library source code, intended to be in extraSourcesDir
+  # Library source code, intended to be used in extraSources
   # Dependencies of this crate are not copied, to the extra sources directory
   # but they are referenced from the parent directory (parent crate's extra sources).
   vendoredSrc =
     pkgs.stdenv.mkDerivation
       {
         src = cleanSrc;
-        name = crateName;
+        name = "${crateName}-${version}";
         unpackPhase = ''
           mkdir $out
           cp -r $src/* $out
