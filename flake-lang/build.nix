@@ -56,11 +56,13 @@
             readOnly = true;
             description = lib.mdDoc ''Makes a derivation containing a Haskell Cabal package with data modules (using Cabal data stanzas)'';
             example = lib.mdDoc ''
-              haskellData {
-                srcs = [ ./. ];
-                cabalDataPatterns = [ "**/*.json" ];
-                cabalPackageName = "golden-json-data";
-              };
+              ```haskell
+                haskellData {
+                  srcs = [ ./. ];
+                  cabalDataPatterns = [ "**/*.json" ];
+                  cabalPackageName = "golden-json-data";
+                };
+              ```
             '';
           };
 
