@@ -122,7 +122,7 @@ let
   nlib = pkgs.lib;
 in
 {
-  _file = "lambda-buffers/extras/haskell.nix/extra-hackage.nix";
+  _file = "flake-lang.nix/flake-lang/haskell.nix/extra-hackage.nix";
   options = with lib.types; {
     extraHackage = lib.mkOption {
       type = listOf str; # FIXME: Allow passing in a tuple of the src and cabal file instead.
