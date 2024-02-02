@@ -5,6 +5,7 @@ _:
 {
   imports =
     [
+      ./pre-commit.nix
       ./haskell-flake-project/build.nix
       ./rust-flake-project/build.nix
       ./typescript-flake-project/build.nix

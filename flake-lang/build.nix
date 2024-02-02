@@ -1,5 +1,4 @@
-# Note(jaredponn): 
-
+# NOTE(jaredponn):
 # Loosely, the key idea is that in this flake we want to have an attribute like
 # ```
 # lib.<system> = {
@@ -10,7 +9,7 @@
 # };
 # ```
 # This is unfortunately not super easy to do with flake-parts! Some useful
-# links + examples are as follows. 
+# links + examples are as follows.
 # - [1] https://github.com/hercules-ci/flake-parts/blob/main/lib.nix
 # - [2] https://github.com/hercules-ci/flake-parts/pull/63/files
 # - [3] https://github.com/hercules-ci/flake-parts/blob/main/modules/formatter.nix
@@ -79,8 +78,23 @@
             default = import ./typescript/flake-typescript.nix pkgs;
             readOnly = true;
             description = lib.mdDoc builtins.readFile ./typescript/description.md;
-            # TODO(jaredponn): add an example
-            # example = lib.mdDoc '' '';
+            example = lib.mdDoc ''TODO(jaredponn)'';
+          };
+
+          rustMonorepoPreCommit = lib.mkOption {
+            type = lib.types.flakeModule;
+            default = ./pre-commit-hooks/rust-monorepo.nix;
+            readOnly = true;
+            description = lib.mdDoc ''pre-commit-hooks.nix hook for Rust in a monorepo setting'';
+            example = lib.mdDoc ''TODO(bladyjoker)'';
+          };
+
+          denoPreCommit = lib.mkOption {
+            type = lib.types.flakeModule;
+            default = ./pre-commit-hooks/deno.nix;
+            readOnly = true;
+            description = lib.mdDoc ''pre-commit-hooks.nix hook for Deno in a monorepo setting'';
+            example = lib.mdDoc ''TODO(bladyjoker)'';
           };
 
         };

@@ -1,7 +1,9 @@
 { inputs, ... }: {
-  imports = [ inputs.pre-commit-hooks.flakeModule ];
+  imports = [
+    inputs.pre-commit-hooks.flakeModule
+  ];
   perSystem = { config, ... }: {
-    devShells.dev-pre-commit = config.pre-commit.devShell;
+    devShells.default = config.pre-commit.devShell;
     pre-commit.settings = {
       hooks = {
         # Typos
