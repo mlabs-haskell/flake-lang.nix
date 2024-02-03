@@ -1,6 +1,7 @@
 { inputs, ... }: {
   imports = [
     inputs.pre-commit-hooks.flakeModule
+    ./flake-lang/pre-commit-hooks/rust-monorepo.nix
   ];
   perSystem = { config, ... }: {
     devShells.default = config.pre-commit.devShell;
@@ -20,6 +21,19 @@
         cabal-fmt.enable = true;
         hlint.enable = true;
         fourmolu.enable = true;
+
+        # Typescript
+        denofmt = {
+          enable = true;
+          # NOTE(jaredponn): We follow the default files deno formats, except
+          # we exclude markdown files. See:
+          #   [1] https://docs.deno.com/runtime/manual/tools/formatter
+          files = ''^.*\.(js|ts|jsx|tsx|json|jsonc)$'';
+        };
+        denolint.enable = true;
+
+        # Rust
+        rustfmt-monorepo.enable = true;
       };
     };
   };
