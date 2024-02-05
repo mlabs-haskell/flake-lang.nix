@@ -18,10 +18,7 @@
   },
   "author": "Jared Pon",
   "license": "ISC",
-  "files": 
-    [ "./dist/**/*"
-    , "./.extra-dependencies/**/*"
-    ],
+  "files": ["./dist/**/*", "./.extra-dependencies/**/*"],
   "dependencies": {
     "typescript": "^5.3.3",
     "typescript-flake-project": "file:.extra-dependencies/typescript-flake-project-1.0.0.tgz"

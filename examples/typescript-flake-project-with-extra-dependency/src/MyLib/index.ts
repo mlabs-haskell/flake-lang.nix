@@ -1,5 +1,5 @@
-import * as TsFlakeProject from 'typescript-flake-project'
+import * as TsFlakeProject from "typescript-flake-project";
 
 export function helloWorld() {
-    TsFlakeProject.helloWorld();
+  TsFlakeProject.helloWorld();
 }
