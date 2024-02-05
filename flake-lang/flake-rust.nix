@@ -51,7 +51,7 @@ let
           mkdir $out
           cp -r $src/* $out
           cd $out
-          sed -i 's/${pkgs.lib.escapeRegex extraSourcesDir}/../g' Cargo.toml
+          sed -Ei 's/${pkgs.lib.escapeRegex extraSourcesDir}/../g' Cargo.toml
         '';
       };
 
