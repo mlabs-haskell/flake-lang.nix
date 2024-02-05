@@ -41,7 +41,7 @@
     ## Foundational Plutus library
     plutus.url = "github:input-output-hk/plutus";
 
-    ## Plutarch eDSL that LB generates to
+    ## Plutarch eDSL
     plutarch = {
       url = "github:plutonomicon/plutarch-plutus";
       flake = false;

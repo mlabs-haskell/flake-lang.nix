@@ -72,6 +72,22 @@
             '';
           };
 
+          haskellData = lib.mkOption {
+            type = lib.types.functionTo lib.types.attrs;
+            default = import ./haskell-data.nix pkgs;
+            readOnly = true;
+            description = lib.mdDoc ''Makes a derivation containing a Haskell Cabal package with data modules (using Cabal data stanzas)'';
+            example = lib.mdDoc ''
+              ```haskell
+                haskellData {
+                  srcs = [ ./. ];
+                  cabalDataPatterns = [ "**/*.json" ];
+                  cabalPackageName = "golden-json-data";
+                };
+              ```
+            '';
+          };
+
           haskellFlake = lib.mkOption {
             type = lib.types.functionTo lib.types.attrs;
             default = import ./flake-haskell.nix pkgsForHaskellNix;
