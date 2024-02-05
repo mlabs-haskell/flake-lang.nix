@@ -37,7 +37,7 @@
       flakeModule = {
         rustMonorepoPreCommit = lib.mkOption {
           type = lib.types.lazyAttrsOf lib.types.unspecified;
-          default = import ./pre-commit-hooks/rust-monorepo.nix;
+          default = (import ./pre-commit-hooks/rust-monorepo.nix);
           readOnly = true;
           description = lib.mdDoc ''pre-commit-hooks.nix hook for Rust in a monorepo setting'';
           example = lib.mdDoc ''TODO(bladyjoker)'';
