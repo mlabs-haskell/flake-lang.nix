@@ -4,7 +4,7 @@
   options = {
 
     perSystem = flake-parts-lib.mkPerSystemOption
-      ({ system, config, pkgs, ... }: {
+      ({ system, config, pkgs, pkgsForRust, ... }: {
         options.settings = {
 
           shell = {
@@ -34,6 +34,15 @@
 
           };
 
+          flake-lang.pre-commit-hooks.tools = {
+            rustfmt = lib.mkOption {
+              type = lib.types.package;
+              default = pkgsForRust.rustfmt;
+              readOnly = false;
+              description = lib.mdDoc ''Rust formatter to use for pre-commit hooks'';
+            };
+          };
+
         };
 
 
@@ -58,7 +67,7 @@
 
                 inputs.pre-commit-hooks.outputs.packages.${system}.shellcheck
 
-                inputs.pre-commit-hooks.outputs.packages.${system}.markdownlint-cli
+                inputs.pre-commit-hogoks.outputs.packages.${system}.markdownlint-cli
                 inputs.pre-commit-hooks.outputs.packages.${system}.dhall
 
                 inputs.pre-commit-hooks.outputs.packages.${system}.purty
