@@ -1,4 +1,5 @@
 { flake-parts-lib, lib, ... }: {
+  imports = [ ../../pkgs.nix ];
   options = {
     perSystem = flake-parts-lib.mkPerSystemOption ({ pkgsForRust, ... }: {
       options = {
