@@ -50,7 +50,7 @@
   };
 
   outputs = inputs@{ flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+    flake-parts.lib.mkFlake { inherit inputs; } ({ flake-parts-lib, withSystem, ... }: {
       systems = [ "x86_64-linux" "x86_64-darwin" ];
 
       imports = [
@@ -59,6 +59,7 @@
         ./settings.nix
 
         # Code quality
+        (flake-parts-lib.importApply ./flake-lang/pre-commit-hooks/rust-monorepo.nix { inherit withSystem; })
         ./pre-commit.nix
         ./hercules-ci.nix
 
@@ -70,5 +71,5 @@
         # Documentation
         ./docs/build.nix
       ];
-    };
+    });
 }

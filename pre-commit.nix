@@ -1,7 +1,6 @@
 { inputs, ... }: {
   imports = [
     inputs.pre-commit-hooks.flakeModule
-    ./flake-lang/pre-commit-hooks/rust-monorepo.nix
   ];
   perSystem = { config, ... }: {
     devShells.default = config.pre-commit.devShell;
