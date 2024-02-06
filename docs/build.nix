@@ -1,7 +1,7 @@
 { flake-parts-lib, inputs, ... }: {
   perSystem = { pkgs, config, ... }:
 
-    # Note(jaredponn): What is going on here to generate the documentation?
+    # NOTE(jaredponn): What is going on here to generate the documentation?
     # Since flake-parts is using the module system, and NixOS also uses the
     # module system; we copy how NixOS generates their documentation:
     #  [1] The Nix function which builds the documentation returning an attribute
@@ -110,10 +110,11 @@
       };
 
       devShells = {
-        docs = config.packages.docs.overrideAttrs (_self: super:
+        dev-docs = config.packages.docs.overrideAttrs (_self: super:
           {
             shellHook =
               ''
+                ${config.settings.shell.hook}
                 ${super.configurePhase}
               '';
           }

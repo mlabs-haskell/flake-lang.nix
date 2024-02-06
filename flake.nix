@@ -64,7 +64,7 @@
         ./hercules-ci.nix
 
         # Nix tools
-        (flake-parts-lib.importApply ./flake-lang/build.nix { inherit withSystem; })
+        ./flake-lang/build.nix
 
         # Examples/Tests
         ./examples/build.nix
