@@ -1,6 +1,7 @@
 { inputs, ... }: {
   imports = [
     inputs.pre-commit-hooks.flakeModule # Adds perSystem.pre-commit options
+    ../../settings.nix
   ];
   perSystem = { config, ... }:
     {
