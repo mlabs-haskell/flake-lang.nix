@@ -67,7 +67,7 @@
 
                 inputs.pre-commit-hooks.outputs.packages.${system}.shellcheck
 
-                inputs.pre-commit-hogoks.outputs.packages.${system}.markdownlint-cli
+                inputs.pre-commit-hooks.outputs.packages.${system}.markdownlint-cli
                 inputs.pre-commit-hooks.outputs.packages.${system}.dhall
 
                 inputs.pre-commit-hooks.outputs.packages.${system}.purty
