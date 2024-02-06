@@ -7,7 +7,7 @@
 #   typescriptFlake = ...
 #   ...
 # };
-# flakeModule = {
+# flakeModules = {
 #   rustMonorepoPreCommit = ...
 # };
 # ```
@@ -32,9 +32,9 @@
 
       # Expose attributes like
       # ```
-      # flakeModule.rustMonorepoPreCommit = ..
+      # flakeModules.rustMonorepoPreCommit = ..
       # ```
-      flakeModule = {
+      flakeModules = {
         rustMonorepoPreCommit = lib.mkOption {
           type = lib.types.deferredModule;
           default = import ./pre-commit-hooks/rust-monorepo.nix;
