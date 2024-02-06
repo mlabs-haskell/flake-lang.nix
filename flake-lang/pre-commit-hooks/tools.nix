@@ -1,12 +1,11 @@
 { flake-parts-lib, lib, ... }: {
-  imports = [ ../../pkgs.nix ];
   options = {
-    perSystem = flake-parts-lib.mkPerSystemOption ({ pkgsForRust, ... }: {
+    perSystem = flake-parts-lib.mkPerSystemOption ({ inputs', ... }: {
       options = {
         flake-lang.pre-commit-hooks.tools = {
           rustfmt = lib.mkOption {
             type = lib.types.package;
-            default = pkgsForRust.rustfmt;
+            default = inputs'.rust-overlay.packages.rust;
             readOnly = false;
             description = lib.mdDoc ''Rust formatter to use for pre-commit hooks'';
           };
