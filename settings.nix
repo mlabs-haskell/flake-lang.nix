@@ -5,35 +5,7 @@
 
     perSystem = flake-parts-lib.mkPerSystemOption
       ({ system, config, pkgs, pkgsForRust, ... }: {
-        options.settings = {
-
-          shell = {
-
-            tools = lib.mkOption {
-              type = lib.types.listOf lib.types.package;
-              description = "Tools to include in all devShells";
-            };
-
-            hook = lib.mkOption {
-              type = lib.types.str;
-              description = "Shell script to invoke in all devShells";
-            };
-          };
-
-          haskell = {
-
-            index-state = lib.mkOption {
-              type = lib.types.str;
-              description = "Hackage index state to use when making a haskell.nix build environment";
-            };
-
-            compiler-nix-name = lib.mkOption {
-              type = lib.types.str;
-              description = "GHC Haskell compiler to use when building haskell.nix projects";
-            };
-
-          };
-
+        options = {
           flake-lang.pre-commit-hooks.tools = {
             rustfmt = lib.mkOption {
               type = lib.types.package;
@@ -43,8 +15,37 @@
             };
           };
 
-        };
+          settings = {
 
+            shell = {
+
+              tools = lib.mkOption {
+                type = lib.types.listOf lib.types.package;
+                description = "Tools to include in all devShells";
+              };
+
+              hook = lib.mkOption {
+                type = lib.types.str;
+                description = "Shell script to invoke in all devShells";
+              };
+            };
+
+            haskell = {
+
+              index-state = lib.mkOption {
+                type = lib.types.str;
+                description = "Hackage index state to use when making a haskell.nix build environment";
+              };
+
+              compiler-nix-name = lib.mkOption {
+                type = lib.types.str;
+                description = "GHC Haskell compiler to use when building haskell.nix projects";
+              };
+
+            };
+
+          };
+        };
 
         config = {
 
