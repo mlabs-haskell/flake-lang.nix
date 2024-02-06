@@ -1,6 +1,10 @@
 # Repo wide settings
 { lib, flake-parts-lib, inputs, ... }: {
 
+  imports = [
+    ./pkgs.nix
+  ];
+
   options = {
 
     perSystem = flake-parts-lib.mkPerSystemOption

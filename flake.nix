@@ -55,7 +55,6 @@
 
       imports = [
         # Project configuration
-        ./pkgs.nix
         ./settings.nix
 
         # Code quality
