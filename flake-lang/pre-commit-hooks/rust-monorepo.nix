@@ -1,7 +1,7 @@
-{ inputs, ... }: {
+localFlake: { inputs, flake-parts-lib, ... }: {
   imports = [
     inputs.pre-commit-hooks.flakeModule # Adds perSystem.pre-commit options
-    ./tools.nix
+    (flake-parts-lib.importApply ./tools.nix localFlake)
   ];
   perSystem = { config, ... }:
     {

@@ -1,11 +1,13 @@
-{ flake-parts-lib, lib, ... }: {
+localFlake: { flake-parts-lib, lib, ... }: {
   options = {
-    perSystem = flake-parts-lib.mkPerSystemOption ({ inputs', ... }: {
+    perSystem = flake-parts-lib.mkPerSystemOption ({ system, ... }: {
       options = {
         flake-lang.pre-commit-hooks.tools = {
           rustfmt = lib.mkOption {
             type = lib.types.package;
-            default = inputs'.rust-overlay.packages.rust;
+            default = localFlake.withSystem system ({ inputs', ... }:
+              inputs'.rust-overlay.packages.rust
+            );
             readOnly = false;
             description = lib.mdDoc ''Rust formatter to use for pre-commit hooks'';
           };
