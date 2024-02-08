@@ -28,7 +28,6 @@
     };
 
     db-sync-ctl = {
-      inputs.haskellNix.follows = "ctl/haskell-nix";
       url = "github:input-output-hk/cardano-db-sync/13.1.1.3";
     };
 
