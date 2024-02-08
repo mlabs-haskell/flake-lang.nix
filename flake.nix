@@ -22,7 +22,14 @@
     # Purescript
 
     ## Cardano transaction library (leveraging CTL's Purescript Nix machinery)
-    ctl.url = "github:plutonomicon/cardano-transaction-lib?ref=develop";
+    ctl = {
+      url = "github:plutonomicon/cardano-transaction-lib?ref=develop";
+      inputs.db-sync.follows = "db-sync-ctl";
+    };
+
+    db-sync-ctl = {
+      url = "github:input-output-hk/cardano-db-sync/13.1.1.3";
+    };
 
     # Rust
 
