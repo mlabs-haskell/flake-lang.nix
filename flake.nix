@@ -31,7 +31,6 @@
       url = "github:input-output-hk/cardano-db-sync/13.1.1.3";
     };
 
-
     # Rust
 
     crane.url = "github:ipetkov/crane";
