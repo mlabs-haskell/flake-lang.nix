@@ -369,7 +369,7 @@ pkgs.lib.makeExtensible
       };
 
       shell = pkgs.mkShell {
-        packages = [ nodejs mkNpmExtraDependenciesCmd dataLinkFarmCmd ] ++ devShellTools;
+        packages = [ nodejs mkNpmExtraDependenciesCmd dataLinkFarmCmd ] ++ testTools ++ devShellTools;
 
         shellHook =
           ''
