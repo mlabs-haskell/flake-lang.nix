@@ -1,7 +1,6 @@
-pkgs:
+crane: pkgs:
 
-{ crane
-, src
+{ src
 , crateName
 , version ? "0.1.0"
 , rustVersion ? "latest"

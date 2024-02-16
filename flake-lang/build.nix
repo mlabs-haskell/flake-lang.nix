@@ -62,7 +62,7 @@
 
           rustFlake = lib.mkOption {
             type = lib.types.functionTo lib.types.attrs;
-            default = import ./flake-rust.nix pkgsForRust;
+            default = import ./flake-rust.nix inputs.crane pkgsForRust;
             readOnly = true;
             description = lib.mdDoc ''
               TODO(jaredponn): write down documentation here
