@@ -1,6 +1,7 @@
-crane: pkgs:
+crane': pkgs:
 
 { src
+, crane ? null
 , crateName
 , version ? "0.1.0"
 , rustVersion ? "latest"
@@ -16,10 +17,15 @@ crane: pkgs:
 , cargoNextestExtraArgs ? ""
 }:
 let
+
   rustWithTools = pkgs.rust-bin.stable.${rustVersion}.default.override {
     extensions = [ "rustfmt" "rust-analyzer" "clippy" "rust-src" ];
   };
-  craneLib = crane.lib.${pkgs.system}.overrideToolchain rustWithTools;
+  craneLib =
+    if crane == null then
+      crane'.lib.${pkgs.system}.overrideToolchain rustWithTools
+    else
+      throw ''rustFlake: You're setting the `crane` argument which is deprecated and will be removed in the next major revision'';
 
   cleanSrc = craneLib.cleanCargoSource (craneLib.path src);
 
