@@ -45,12 +45,14 @@ where
   the environment variable `NODE_PATH` as the path to the
   `node_modules/` produced by Nix, and the command
   `${name}-npm-extra-dependencies` which copies the transitive
-  closure of `npmExtraDependencies` to the folder `./extra-dependencies`.
+  closure of `npmExtraDependencies` to the folder `./.extra-dependencies`.
 
   Moreover, the `shellHook` will:
       - create a symbolic link named `node_modules` pointing to
         `$NODE_PATH`; and
-      - executes `${name}-npm-extra-dependencies`.
+      - execute `${name}-npm-extra-dependencies`.
+  As such, one should enter the development shell in the folder that the
+  project exists in, so `npm` may use the provided dependencies from nix.
 
 - `packages."${name}-typescript-exe"` is `packages."${name}-typescript"` except
   runs `npm install --global --prefix="$out"` for the `installPhase` and
