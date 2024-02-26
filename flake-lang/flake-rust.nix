@@ -65,8 +65,24 @@ let
         '';
       };
 
+
+  defNativeBuildInputs =
+    (pkgs.lib.optionals pkgs.stdenv.isLinux [
+      pkgs.pkg-config
+    ]) ++
+    (pkgs.lib.optionals pkgs.stdenv.isDarwin
+      [
+        pkgs.gcc
+        pkgs.darwin.apple_sdk.frameworks.Security
+        pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
+      ]);
+  defBuildInputs = [
+    pkgs.openssl.dev
+  ];
+
   commonArgs = {
-    inherit nativeBuildInputs buildInputs;
+    nativeBuildInputs = defNativeBuildInputs ++ nativeBuildInputs;
+    buildInputs = defBuildInputs ++ buildInputs;
     src = buildEnv;
     pname = crateName;
     strictDeps = true;
@@ -102,8 +118,8 @@ let
 in
 {
   devShells."dev-${crateName}-rust" = craneLib.devShell {
-    buildInputs = buildInputs ++ nativeBuildInputs;
-    packages = devShellTools ++ testTools;
+    buildInputs = commonArgs.buildInputs ++ commonArgs.nativeBuildInputs;
+    packages = devShellTools ++ [ pkgs.cargo-nextest ] ++ testTools;
     shellHook = ''
       ${linkExtraSources}
       ${linkData}
@@ -126,7 +142,7 @@ in
   checks = {
     "${crateName}-rust-test" = craneLib.cargoNextest (commonArgs // {
       inherit cargoArtifacts cargoNextestExtraArgs;
-      nativeBuildInputs = testTools ++ nativeBuildInputs;
+      nativeBuildInputs = commonArgs.nativeBuildInputs ++ testTools;
     });
 
     "${crateName}-rust-clippy" = craneLib.cargoClippy (commonArgs // {
