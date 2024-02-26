@@ -103,7 +103,7 @@ in
 {
   devShells."dev-${crateName}-rust" = craneLib.devShell {
     buildInputs = buildInputs ++ nativeBuildInputs;
-    packages = devShellTools ++ testTools;
+    packages = devShellTools ++ [ pkgs.cargo-nextest ] ++ testTools;
     shellHook = ''
       ${linkExtraSources}
       ${linkData}
