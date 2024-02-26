@@ -298,12 +298,14 @@ in the <code>./docs</code> folder.</p>
 the environment variable <code>NODE_PATH</code> as the path to the
 <code>node_modules/</code> produced by Nix, and the command
 <code>${name}-npm-extra-dependencies</code> which copies the transitive
-closure of <code>npmExtraDependencies</code> to the folder <code>./extra-dependencies</code>.</p>
+closure of <code>npmExtraDependencies</code> to the folder <code>./.extra-dependencies</code>.</p>
 <p>Moreover, the <code>shellHook</code> will:</p>
 <ul>
 <li>create a symbolic link named <code>node_modules</code> pointing to
 <code>$NODE_PATH</code>; and</li>
-<li>executes <code>${name}-npm-extra-dependencies</code>.</li>
+<li>execute <code>${name}-npm-extra-dependencies</code>.
+As such, one should enter the development shell in the folder that the
+project exists in, so <code>npm</code> may use the provided dependencies from nix.</li>
 </ul>
 </li>
 <li>
