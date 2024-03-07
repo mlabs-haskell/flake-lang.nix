@@ -136,14 +136,14 @@ pkgs.lib.makeExtensible
                             then
                                 ln -sf ${pkgs.lib.escapeShellArg dep} .
                             else
-                                test -d ${pkgs.lib.escapeShellArg dep}/tarballs \
-                                    && find ${pkgs.lib.escapeShellArg dep}/tarballs \
+                                ! test -d ${pkgs.lib.escapeShellArg dep}/tarballs \
+                                    || find ${pkgs.lib.escapeShellArg dep}/tarballs \
                                         -mindepth 1 \
                                         -maxdepth 1 \
                                         -exec ln -sf '{}' . \;
 
-                                test -d ${pkgs.lib.escapeShellArg dep}/lib/node_modules \
-                                    && find ${pkgs.lib.escapeShellArg dep}/lib/node_modules \
+                                ! test -d ${pkgs.lib.escapeShellArg dep}/lib/node_modules \
+                                    || find ${pkgs.lib.escapeShellArg dep}/lib/node_modules \
                                         -mindepth 1 \
                                         -maxdepth 1 \
                                         -exec ln -sf '{}' . \;
