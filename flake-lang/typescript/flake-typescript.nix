@@ -10,12 +10,9 @@ pkgs:
   #
   # In general, the list may have elements which are either:
   #     - folder with a `package.json` file (a npm package)
-  #     - a folder to an npm package at `./tarballs/`
-  #     - a folder to an npm package at `./lib/node_modules/`
-  #     - a tarball containing an npm package
-  # 
-  # This argument `dependencies` is the extra dependencies provided by nix for
-  # npm. This will _not_ install the "transitive" dependencies.
+  #     - a folder to a npm package at `./tarballs/`
+  #     - a folder to a npm package at `./lib/node_modules/`
+  #     - a tarball containing a npm package
   #
   # For example, if one wanted to include `typescript` as a dependency, then
   # one could have
