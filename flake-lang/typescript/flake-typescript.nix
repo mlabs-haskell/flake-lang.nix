@@ -277,15 +277,6 @@ pkgs.lib.makeExtensible
           # dependencies are available, we link everything there for
           # `node2nix`.
           buildInputs = super.buildInputs ++ [ mkNpmExtraDependenciesCmd dataLinkFarmCmd ];
-          dependencies = builtins.map
-            (dep:
-              dep
-              # if builtins.typeOf dep.src == "path"
-              # # then dep // { src = pkgs.lib.path.removePrefix srcWithNode2nixIfd.args.src dep.src; }
-              # then dep // { src = pkgs.lib.path.removePrefix srcWithNode2nixIfd.args.src dep.src; }
-              # else dep
-            )
-            (super.dependencies);
           postConfigure =
             ''
               extraDependenciesForNode2nix( ) {
