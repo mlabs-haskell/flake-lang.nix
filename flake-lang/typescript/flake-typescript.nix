@@ -351,6 +351,7 @@ pkgs.lib.makeExtensible
           find "${npmPack}/tarballs" -type f -mindepth 1 -maxdepth 1 -exec tar -xzvf '{}' \;
           find ./package -mindepth 1 -maxdepth 1 -exec mv '{}' "$out/lib/node_modules/${srcWithNode2nixIfd.args.packageName}" \;
         '';
+        inherit (project) npmExtraDependencies;
       };
 
       # Alias for `project`
