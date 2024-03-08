@@ -188,8 +188,8 @@ function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
   ```haskell
     haskellData {
       srcs = [ ./. ];
-      cabalDataPatterns = [ &quot;**/*.json&quot; ];
-      cabalPackageName = &quot;golden-json-data&quot;;
+      cabalDataPatterns = [ "**/*.json" ];
+      cabalPackageName = "golden-json-data";
     };
   ```
 ''
@@ -262,30 +262,30 @@ function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
 <p>Creates a flake for a TypeScript project.</p>
 <p>Returns an attribute set of the form</p>
 <pre><code class="language-nix">{
-  devShells.&quot;${name}-typescript&quot; = derivation { ... };
-  packages.&quot;${name}-typescript&quot; = derivation { ... };
-  packages.&quot;${name}-typescript-exe&quot; = derivation { ... };
-  packages.&quot;${name}-typescript-tgz&quot; = derivation { ... };
-  packages.&quot;${name}-typescript-node2nix&quot; = derivation { ... };
-  checks.&quot;${name}-typescript-test&quot; = derivation { ... };
+  devShells."${name}-typescript" = derivation { ... };
+  packages."${name}-typescript" = derivation { ... };
+  packages."${name}-typescript-exe" = derivation { ... };
+  packages."${name}-typescript-tgz" = derivation { ... };
+  packages."${name}-typescript-node2nix" = derivation { ... };
+  checks."${name}-typescript-test" = derivation { ... };
 }
 </code></pre>
 <p>where</p>
 <ul>
 <li>
-<p><code>packages.&quot;${name}-typescript&quot;</code> contains the project with a
+<p><code>packages."${name}-typescript"</code> contains the project with a
 <code>node_modules/</code> provided by Nix (in the <code>configurePhase</code>), and
-its <code>buildPhase</code> runs <code>npm run &quot;$npmBuildScript&quot;</code> (where <code>npmBuildScript</code> is
+its <code>buildPhase</code> runs <code>npm run "$npmBuildScript"</code> (where <code>npmBuildScript</code> is
 <code>build</code> by default).
 Indeed, one can overlay the entire derivation (which contains
 all its dependencies) to postprocess their project as they
 see fit. For example, one may want to generate documentation
 instead of building the project, by running:</p>
-<pre><code class="language-nix">packages.&quot;${name}-typescript&quot;.overrideAttrs (_self: _super: {
-  npmBuildScript = &quot;docs&quot;;
+<pre><code class="language-nix">packages."${name}-typescript".overrideAttrs (_self: _super: {
+  npmBuildScript = "docs";
   installPhase = 
      ''
-         mv ./docs &quot;$out&quot;
+         mv ./docs "$out"
      '';
  });
 </code></pre>
@@ -294,7 +294,7 @@ instead of building the project, by running:</p>
 in the <code>./docs</code> folder.</p>
 </li>
 <li>
-<p><code>devShells.&quot;${name}-typescript-test&quot;</code> provides a developer shell with
+<p><code>devShells."${name}-typescript-test"</code> provides a developer shell with
 the environment variable <code>NODE_PATH</code> as the path to the
 <code>node_modules/</code> produced by Nix, and the command
 <code>${name}-npm-extra-dependencies</code> which copies the transitive
@@ -309,17 +309,17 @@ project exists in, so <code>npm</code> may use the provided dependencies from ni
 </ul>
 </li>
 <li>
-<p><code>packages.&quot;${name}-typescript-exe&quot;</code> is <code>packages.&quot;${name}-typescript&quot;</code> except
-runs <code>npm install --global --prefix=&quot;$out&quot;</code> for the <code>installPhase</code> and
+<p><code>packages."${name}-typescript-exe"</code> is <code>packages."${name}-typescript"</code> except
+runs <code>npm install --global --prefix="$out"</code> for the <code>installPhase</code> and
 copies some of the symbolic links so that the output makes sense.</p>
 </li>
 <li>
-<p><code>packages.&quot;${name}-typescript-tgz&quot;</code> is <code>packages.&quot;${name}-typescript&quot;</code> except
+<p><code>packages."${name}-typescript-tgz"</code> is <code>packages."${name}-typescript"</code> except
 runs <code>npm pack</code> after the <code>buildPhase</code> to create a tarball of the project in
 the directory <code>$out/tarballs/</code>.</p>
 </li>
 <li>
-<p><code>packages.&quot;${name}-typescript-test&quot;</code> is <code>packages.&quot;${name}-typescript&quot;</code>
+<p><code>packages."${name}-typescript-test"</code> is <code>packages."${name}-typescript"</code>
 except it runs <code>npm test</code> after the <code>buildPhase</code> succeeding only if <code>npm test</code> succeeds.</p>
 </li>
 </ul>
@@ -328,7 +328,7 @@ function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
 <p><em>Default:</em>
 <code>&lt;function, args: {data?, dataDir?, devShellHook?, devShellTools?, name, nodejs?, npmBuildScript?, npmExtraDependencies?, src, testTools?}&gt;</code></p>
 <p><em>Example:</em>
-<code>&quot;TODO(jaredponn)&quot;</code></p>
+<code>"TODO(jaredponn)"</code></p>
 <p><em>Declared by:</em></p>
 <ul>
 <li><a href="https://github.com/mlabs-haskell/flake-lang.nix/blob/master/flake-lang/build.nix">flake-lang/build.nix</a></li>
