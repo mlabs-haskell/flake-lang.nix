@@ -265,6 +265,7 @@ function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
   devShells."${name}-typescript" = derivation { ... };
   packages."${name}-typescript" = derivation { ... };
   packages."${name}-typescript-exe" = derivation { ... };
+  packages."${name}-typescript-lib" = derivation { ... };
   packages."${name}-typescript-tgz" = derivation { ... };
   packages."${name}-typescript-node2nix" = derivation { ... };
   checks."${name}-typescript-test" = derivation { ... };
@@ -294,19 +295,19 @@ instead of building the project, by running:</p>
 in the <code>./docs</code> folder.</p>
 </li>
 <li>
-<p><code>devShells."${name}-typescript-test"</code> provides a developer shell with
-the environment variable <code>NODE_PATH</code> as the path to the
-<code>node_modules/</code> produced by Nix, and the command
-<code>${name}-npm-extra-dependencies</code> which copies the transitive
-closure of <code>npmExtraDependencies</code> to the folder <code>./.extra-dependencies</code>.</p>
+<p><code>devShells."${name}-typescript"</code> provides a developer shell with the
+environment variable <code>NODE_PATH</code> as the path to the <code>node_modules/</code> produced
+by Nix, and the command <code>${name}-npm-extra-dependencies</code> which copies the
+transitive closure of <code>npmExtraDependencies</code> to the folder
+<code>./.extra-dependencies</code>.</p>
 <p>Moreover, the <code>shellHook</code> will:</p>
 <ul>
 <li>create a symbolic link named <code>node_modules</code> pointing to
 <code>$NODE_PATH</code>; and</li>
-<li>execute <code>${name}-npm-extra-dependencies</code>.
-As such, one should enter the development shell in the folder that the
-project exists in, so <code>npm</code> may use the provided dependencies from nix.</li>
+<li>execute <code>${name}-npm-extra-dependencies</code>.</li>
 </ul>
+<p>As such, one should enter the development shell in the folder that the
+project exists in, so <code>npm</code> may use the provided dependencies from nix.</p>
 </li>
 <li>
 <p><code>packages."${name}-typescript-exe"</code> is <code>packages."${name}-typescript"</code> except
@@ -317,6 +318,10 @@ copies some of the symbolic links so that the output makes sense.</p>
 <p><code>packages."${name}-typescript-tgz"</code> is <code>packages."${name}-typescript"</code> except
 runs <code>npm pack</code> after the <code>buildPhase</code> to create a tarball of the project in
 the directory <code>$out/tarballs/</code>.</p>
+</li>
+<li>
+<p><code>packages."${name}-typescript-lib"</code> is <code>packages."${name}-typescript-tgz"</code> except
+that it unpacks the tarball to <code>$out/lib/node_modules/&lt;package-name&gt;</code></p>
 </li>
 <li>
 <p><code>packages."${name}-typescript-test"</code> is <code>packages."${name}-typescript"</code>
