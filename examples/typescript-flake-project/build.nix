@@ -17,6 +17,7 @@
       packages = {
         inherit (typescriptFlake.packages)
           typescript-flake-project-typescript
+          typescript-flake-project-typescript-lib
           typescript-flake-project-typescript-tgz
           typescript-flake-project-typescript-node2nix;
       };

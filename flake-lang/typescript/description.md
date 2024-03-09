@@ -10,6 +10,7 @@ Returns an attribute set of the form
   devShells."${name}-typescript" = derivation { ... };
   packages."${name}-typescript" = derivation { ... };
   packages."${name}-typescript-exe" = derivation { ... };
+  packages."${name}-typescript-lib" = derivation { ... };
   packages."${name}-typescript-tgz" = derivation { ... };
   packages."${name}-typescript-node2nix" = derivation { ... };
   checks."${name}-typescript-test" = derivation { ... };
@@ -41,16 +42,17 @@ where
     `scripts.docs = <some-script>` which produces documentation
     in the `./docs` folder.
 
-- `devShells."${name}-typescript-test"` provides a developer shell with
-  the environment variable `NODE_PATH` as the path to the
-  `node_modules/` produced by Nix, and the command
-  `${name}-npm-extra-dependencies` which copies the transitive
-  closure of `npmExtraDependencies` to the folder `./.extra-dependencies`.
+- `devShells."${name}-typescript"` provides a developer shell with the
+  environment variable `NODE_PATH` as the path to the `node_modules/` produced
+  by Nix, and the command `${name}-npm-extra-dependencies` which copies the
+  transitive closure of `npmExtraDependencies` to the folder
+  `./.extra-dependencies`.
 
   Moreover, the `shellHook` will:
       - create a symbolic link named `node_modules` pointing to
         `$NODE_PATH`; and
       - execute `${name}-npm-extra-dependencies`.
+
   As such, one should enter the development shell in the folder that the
   project exists in, so `npm` may use the provided dependencies from nix.
 
@@ -61,6 +63,9 @@ where
 - `packages."${name}-typescript-tgz"` is `packages."${name}-typescript"` except
   runs `npm pack` after the `buildPhase` to create a tarball of the project in
   the directory `$out/tarballs/`.
+
+- `packages."${name}-typescript-lib"` is `packages."${name}-typescript-tgz"` except
+  that it unpacks the tarball to `$out/lib/node_modules/<package-name>`
 
 - `packages."${name}-typescript-test"` is `packages."${name}-typescript"`
   except it runs `npm test` after the `buildPhase` succeeding only if `npm

@@ -18,8 +18,11 @@
   },
   "author": "Jared Pon",
   "license": "ISC",
-  "files": ["./dist/**/*", "./.extra-dependencies/**/*"],
+  "files": [
+    "./dist/**/*",
+    "./.extra-dependencies/**/*"
+  ],
   "dependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.2"
   }
 }
