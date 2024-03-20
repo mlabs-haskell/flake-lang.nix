@@ -4,6 +4,7 @@ inputCrane: pkgs:
 , crane ? null
 , crateName
 , version ? "0.1.0"
+, rustProfile ? "stable"
 , rustVersion ? "latest"
 , nativeBuildInputs ? [ ]
 , buildInputs ? [ ]
@@ -18,7 +19,7 @@ inputCrane: pkgs:
 }:
 let
 
-  rustWithTools = pkgs.rust-bin.stable.${rustVersion}.default.override {
+  rustWithTools = pkgs.rust-bin.${rustProfile}.${rustVersion}.default.override {
     extensions = [ "rustfmt" "rust-analyzer" "clippy" "rust-src" ];
   };
   craneLib =
