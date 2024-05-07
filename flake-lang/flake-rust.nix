@@ -132,7 +132,6 @@ in
     "${crateName}-rust" = craneLib.buildPackage (commonArgs // {
       inherit cargoArtifacts;
       doCheck = false;
-      doInstallCargoArtifacts = true;
     });
 
     "${crateName}-rust-src" = vendoredSrc;
