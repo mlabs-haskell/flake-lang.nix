@@ -1,9 +1,10 @@
 { lib, ... }: {
-  perSystem = { config, ... }:
+  perSystem = { config, pkgs, ... }:
 
     let
       inherit (builtins) mapAttrs;
-      inherit (lib) mapAttrs' nameValuePair recursiveUpdate;
+      inherit (lib) mapAttrs' nameValuePair mkIf;
+      inherit (pkgs.stdenv) isLinux;
 
       commonArgs = {
         src = ./.;
@@ -23,11 +24,14 @@
 
       rustFlakeMusl' = mapAttrs (_: addMuslSuffixToAttrNames) rustFlakeMusl;
     in
-    recursiveUpdate
-      {
-        inherit (rustFlake) packages checks devShells;
-      }
-      {
-        inherit (rustFlakeMusl') packages checks devShells;
-      };
+    {
+      imports = [
+        {
+          inherit (rustFlake) packages checks devShells;
+        }
+        (mkIf isLinux {
+          inherit (rustFlakeMusl') packages checks devShells;
+        })
+      ];
+    };
 }
