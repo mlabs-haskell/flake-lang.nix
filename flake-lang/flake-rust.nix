@@ -17,7 +17,7 @@ inputCrane: pkgs:
 , testTools ? [ ]
 , cargoNextestExtraArgs ? ""
 , doInstallCargoArtifacts ? false
-, target ? null
+, target ? pkgs.stdenv.hostPlatform.config
 , extraRustcFlags ? null
 , extraCargoArgs ? null
 , extraEnvVars ? null
@@ -27,11 +27,10 @@ let
   inherit (pkgs.lib) optionalAttrs;
 
   rustWithTools = pkgs.rust-bin.${rustProfile}.${rustVersion}.default.override
-    ({
+    {
       extensions = [ "rustfmt" "rust-analyzer" "clippy" "rust-src" ];
-    } // optionalAttrs (target != null) {
       targets = [ target ];
-    });
+    };
 
   craneLib =
     let
