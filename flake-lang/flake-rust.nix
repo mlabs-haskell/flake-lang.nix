@@ -16,12 +16,22 @@ inputCrane: pkgs:
 , devShellTools ? [ ]
 , testTools ? [ ]
 , cargoNextestExtraArgs ? ""
+, doInstallCargoArtifacts ? false
+, target ? pkgs.stdenv.hostPlatform.config
+, extraRustcFlags ? null
+, extraCargoArgs ? null
+, extraEnvVars ? null
 }:
-let
 
-  rustWithTools = pkgs.rust-bin.${rustProfile}.${rustVersion}.default.override {
-    extensions = [ "rustfmt" "rust-analyzer" "clippy" "rust-src" ];
-  };
+let
+  inherit (pkgs.lib) optionalAttrs;
+
+  rustWithTools = pkgs.rust-bin.${rustProfile}.${rustVersion}.default.override
+    {
+      extensions = [ "rustfmt" "rust-analyzer" "clippy" "rust-src" ];
+      targets = [ target ];
+    };
+
   craneLib =
     let
       crane' =
@@ -87,7 +97,14 @@ let
     src = buildEnv;
     pname = crateName;
     strictDeps = true;
-  };
+  } // optionalAttrs (target != null) {
+    CARGO_BUILD_TARGET = target;
+  } // optionalAttrs (extraRustcFlags != null) {
+    CARGO_BUILD_RUSTFLAGS = extraRustcFlags;
+  } // optionalAttrs (extraCargoArgs != null) {
+    cargoExtraArgs = extraCargoArgs;
+  } // optionalAttrs (extraEnvVars != null) extraEnvVars;
+
   cargoArtifacts = craneLib.buildDepsOnly commonArgs;
 
   # Extra sources
@@ -132,7 +149,7 @@ in
     "${crateName}-rust" = craneLib.buildPackage (commonArgs // {
       inherit cargoArtifacts;
       doCheck = false;
-      doInstallCargoArtifacts = true;
+      inherit doInstallCargoArtifacts;
     });
 
     "${crateName}-rust-src" = vendoredSrc;
