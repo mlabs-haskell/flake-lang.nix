@@ -8,6 +8,7 @@ _:
       ./haskell-flake-project/build.nix
       ./rust-flake-project/build.nix
       ./rust-flake-project-with-extra-dependency/build.nix
+      ./rust-flake-project-cross-compilation/build.nix
       ./typescript-flake-project/build.nix
       ./typescript-flake-project-with-extra-dependency/build.nix
       ./typescript-flake-project-with-transitive-extra-dependency/build.nix
