@@ -42,7 +42,7 @@ let
           pkgs.lib.showWarnings [ ''rustFlake: You're setting the `crane` argument which is deprecated and will be removed in the next major revision'' ] crane;
 
     in
-    crane'.lib.${pkgs.system}.overrideToolchain rustWithTools;
+    (crane'.mkLib pkgs).overrideToolchain rustWithTools;
 
   cleanSrc =
     let
@@ -55,7 +55,7 @@ let
     in
     pkgs.lib.cleanSourceWith {
       inherit src filter;
-      name = "source"; # Be reproducible, regardless of the directory name
+      name = "source";
     };
 
   # Library source code with extra dependencies copied
