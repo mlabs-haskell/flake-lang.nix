@@ -1,9 +1,10 @@
 inputCrane: pkgs:
 
 { src
+, extraSourceFilters ? [ ]
 , crane ? null
 , crateName
-, version ? "0.1.0"
+, version ? "v0"
 , rustProfile ? "stable"
 , rustVersion ? "latest"
 , nativeBuildInputs ? [ ]
@@ -41,9 +42,21 @@ let
           pkgs.lib.showWarnings [ ''rustFlake: You're setting the `crane` argument which is deprecated and will be removed in the next major revision'' ] crane;
 
     in
-    crane'.lib.${pkgs.system}.overrideToolchain rustWithTools;
+    (crane'.mkLib pkgs).overrideToolchain rustWithTools;
 
-  cleanSrc = craneLib.cleanCargoSource (craneLib.path src);
+  cleanSrc =
+    let
+      filter = path: type:
+        pkgs.lib.foldr
+          (filterFn: result: result || filterFn path type)
+          (craneLib.filterCargoSources path type)
+          extraSourceFilters;
+
+    in
+    pkgs.lib.cleanSourceWith {
+      inherit src filter;
+      name = "source";
+    };
 
   # Library source code with extra dependencies copied
   buildEnv =
