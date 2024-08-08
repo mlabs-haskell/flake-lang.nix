@@ -1,9 +1,10 @@
 inputCrane: pkgs:
 
 { src
+, extraSourceFilters ? [ ]
 , crane ? null
 , crateName
-, version ? "0.1.0"
+, version ? "v0"
 , rustProfile ? "stable"
 , rustVersion ? "latest"
 , nativeBuildInputs ? [ ]
@@ -43,7 +44,19 @@ let
     in
     crane'.lib.${pkgs.system}.overrideToolchain rustWithTools;
 
-  cleanSrc = craneLib.cleanCargoSource (craneLib.path src);
+  cleanSrc =
+    let
+      filter = path: type:
+        pkgs.lib.foldr
+          (filterFn: result: result || filterFn path type)
+          (craneLib.filterCargoSources path type)
+          extraSourceFilters;
+
+    in
+    pkgs.lib.cleanSourceWith {
+      inherit src filter;
+      name = "source"; # Be reproducible, regardless of the directory name
+    };
 
   # Library source code with extra dependencies copied
   buildEnv =

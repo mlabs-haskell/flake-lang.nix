@@ -13,6 +13,11 @@
 
           devShellHook = config.settings.shell.hook;
 
+          extraSourceFilters = [
+            # Include Markdown files in sources
+            (path: _type: builtins.match ".*md$" path != null)
+          ];
+
         };
     in
     {
