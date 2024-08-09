@@ -5,14 +5,14 @@ inputCrane: pkgs:
   src
 , # Extra filters to add non-rust related files to the derivation
   extraSourceFilters ? [ ]
-, # Crane version to be used
-  crane ? null
+, crane ? null # deprecated
 , # Name of the project
   crateName
 , # Major version of the project
   version ? "v0"
-, # Rust profile (stable, nightly, etc.)
+, # Rust channel (stable, nightly, etc.)
   rustChannel ? "stable"
+, rustProfile ? null # deprecated
 , # Rust version
   rustVersion ? "latest"
 , # Additional native build inputs
@@ -50,11 +50,21 @@ inputCrane: pkgs:
 let
   inherit (pkgs.lib) optionalAttrs;
 
-  rustWithTools = pkgs.rust-bin.${rustChannel}.${rustVersion}.default.override
-    {
-      extensions = [ "rustfmt" "rust-analyzer" "clippy" "rust-src" ];
-      targets = [ target ];
-    };
+  rustWithTools =
+    let
+      rustChannel' =
+        if rustProfile == null
+        then rustChannel
+        else
+          pkgs.lib.showWarnings
+            [ ''rustFlake: The `rustProfile` argument is deprecated, please use `rustChannel` instead'' ]
+            rustProfile;
+    in
+    pkgs.rust-bin.${rustChannel'}.${rustVersion}.default.override
+      {
+        extensions = [ "rustfmt" "rust-analyzer" "clippy" "rust-src" ];
+        targets = [ target ];
+      };
 
   craneLib =
     let
@@ -62,7 +72,9 @@ let
         if crane == null then
           inputCrane
         else
-          pkgs.lib.showWarnings [ ''rustFlake: You're setting the `crane` argument which is deprecated and will be removed in the next major revision'' ] crane;
+          pkgs.lib.showWarnings
+            [ ''rustFlake: You're setting the `crane` argument which is deprecated and will be removed in the next major revision'' ]
+            crane;
 
     in
     (crane'.mkLib pkgs).overrideToolchain rustWithTools;
