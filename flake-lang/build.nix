@@ -39,7 +39,7 @@
           type = lib.types.deferredModule;
           default = flake-parts-lib.importApply ./pre-commit-hooks/rust-monorepo.nix { inherit withSystem; };
           readOnly = true;
-          description = lib.mdDoc ''pre-commit-hooks.nix hook for Rust in a monorepo setting'';
+          description = ''pre-commit-hooks.nix hook for Rust in a monorepo setting'';
           example = lib.mdDoc ''TODO(bladyjoker)'';
         };
 
@@ -52,7 +52,7 @@
             type = lib.types.functionTo lib.types.attrs;
             default = import ./flake-purescript.nix pkgsForCtl;
             readOnly = true;
-            description = lib.mdDoc ''
+            description = ''
               TODO(jaredponn): write down documentation here
             '';
             example = lib.mdDoc ''
@@ -62,21 +62,17 @@
 
           rustFlake = lib.mkOption {
             type = lib.types.functionTo lib.types.attrs;
-            default = import ./flake-rust.nix inputs.crane pkgsForRust;
+            default = import ./rust/flake-rust.nix inputs.crane pkgsForRust;
             readOnly = true;
-            description = lib.mdDoc ''
-              TODO(jaredponn): write down documentation here
-            '';
-            example = lib.mdDoc ''
-              TODO(jaredponn): write down an example here
-            '';
+            description = builtins.readFile ./rust/description.md;
+            example = builtins.readFile ../examples/rust-flake-project/build.nix;
           };
 
           haskellData = lib.mkOption {
             type = lib.types.functionTo lib.types.attrs;
             default = import ./haskell-data.nix pkgs;
             readOnly = true;
-            description = lib.mdDoc ''Makes a derivation containing a Haskell Cabal package with data modules (using Cabal data stanzas)'';
+            description = ''Makes a derivation containing a Haskell Cabal package with data modules (using Cabal data stanzas)'';
             example = lib.mdDoc ''
               ```haskell
                 haskellData {
@@ -92,7 +88,7 @@
             type = lib.types.functionTo lib.types.attrs;
             default = import ./flake-haskell.nix pkgsForHaskellNix;
             readOnly = true;
-            description = lib.mdDoc ''
+            description = ''
               TODO(jaredponn): write down documentation here
             '';
             example = lib.mdDoc ''
@@ -104,7 +100,7 @@
             type = lib.types.functionTo lib.types.attrs;
             default = import ./flake-haskell-plutus.nix inputs.cardano-haskell-packages pkgsForHaskellNix;
             readOnly = true;
-            description = lib.mdDoc ''
+            description = ''
               TODO(jaredponn): write down documentation here
             '';
             example = lib.mdDoc ''
@@ -116,7 +112,7 @@
             type = lib.types.functionTo lib.types.attrs;
             default = import ./typescript/flake-typescript.nix pkgs;
             readOnly = true;
-            description = lib.mdDoc builtins.readFile ./typescript/description.md;
+            description = builtins.readFile ./typescript/description.md;
             example = lib.mdDoc ''TODO(jaredponn)'';
           };
 

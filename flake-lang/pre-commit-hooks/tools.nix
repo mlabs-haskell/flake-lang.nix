@@ -9,7 +9,7 @@ localFlake: { flake-parts-lib, lib, ... }: {
               inputs'.rust-overlay.packages.rust
             );
             readOnly = false;
-            description = lib.mdDoc ''Rust formatter to use for pre-commit hooks'';
+            description = ''Rust formatter to use for pre-commit hooks'';
           };
         };
       };

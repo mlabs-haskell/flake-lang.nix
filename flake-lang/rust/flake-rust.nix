@@ -1,33 +1,56 @@
 inputCrane: pkgs:
 
-{ src
-, extraSourceFilters ? [ ]
-, crane ? null
-, crateName
-, version ? "v0"
-, rustProfile ? "stable"
-, rustVersion ? "latest"
-, nativeBuildInputs ? [ ]
-, buildInputs ? [ ]
-, extraSources ? [ ]
-, extraSourcesDir ? ".extras"
-, data ? [ ]
-, dataDir ? "data"
-, devShellHook ? ""
-, devShellTools ? [ ]
-, testTools ? [ ]
-, cargoNextestExtraArgs ? ""
-, doInstallCargoArtifacts ? false
-, target ? pkgs.stdenv.hostPlatform.config
-, extraRustcFlags ? null
-, extraCargoArgs ? null
-, extraEnvVars ? null
+{
+  # Source folder (unfiltered)
+  src
+, # Extra filters to add non-rust related files to the derivation
+  extraSourceFilters ? [ ]
+, # Crane version to be used
+  crane ? null
+, # Name of the project
+  crateName
+, # Major version of the project
+  version ? "v0"
+, # Rust profile (stable, nightly, etc.)
+  rustChannel ? "stable"
+, # Rust version
+  rustVersion ? "latest"
+, # Additional native build inputs
+  nativeBuildInputs ? [ ]
+, # Additional build inputs
+  buildInputs ? [ ]
+, # Extra sources, allowing to use other rustFlake components to be used as dependencies
+  extraSources ? [ ]
+, # Folder to store extra source libraries
+  extraSourcesDir ? ".extras"
+, # Data dependencies
+  data ? [ ]
+, # Folder to store the data dependencies
+  dataDir ? "data"
+, # Shell script executed after entering the dev shell
+  devShellHook ? ""
+, # Packages made available in the dev shell
+  devShellTools ? [ ]
+, # Packages made available in checks and the dev shell
+  testTools ? [ ]
+, # Extra cargo nextest arguments
+  cargoNextestExtraArgs ? ""
+, # Controls whether cargo's target directory should be copied as an output
+  doInstallCargoArtifacts ? false
+, # Rust compilation target
+  target ? pkgs.stdenv.hostPlatform.config
+, # Extra rustc flags
+  extraRustcFlags ? null
+, # Extra cargo arguments
+  extraCargoArgs ? null
+, # Extra environment variables
+  extraEnvVars ? null
 }:
 
 let
   inherit (pkgs.lib) optionalAttrs;
 
-  rustWithTools = pkgs.rust-bin.${rustProfile}.${rustVersion}.default.override
+  rustWithTools = pkgs.rust-bin.${rustChannel}.${rustVersion}.default.override
     {
       extensions = [ "rustfmt" "rust-analyzer" "clippy" "rust-src" ];
       targets = [ target ];
