@@ -240,14 +240,83 @@ function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
 <li><a href="https://github.com/mlabs-haskell/flake-lang.nix/blob/master/flake-lang/build.nix">flake-lang/build.nix</a></li>
 </ul>
 <h2 id="persystemlibrustflake"><a class="header" href="#persystemlibrustflake">perSystem.lib.rustFlake</a></h2>
-<p>TODO(jaredponn): write down documentation here</p>
+<p>Creates a flake for a Rust project.</p>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>src</code>: Source folder (unfiltered)</li>
+<li><code>extraSourceFilters</code>(optional): Extra filters to add non-rust related files to
+the derivation</li>
+<li><code>crane</code>(optional): Crane version to be used</li>
+<li><code>crateName</code>: Name of the project</li>
+<li><code>version</code>: Major version of the project</li>
+<li><code>rustChannel</code>(default=stable): Rust profile (stable, nightly, etc.)</li>
+<li><code>rustVersion</code>(default=latest): Rust version</li>
+<li><code>nativeBuildInputs</code>(optional): Additional native build inputs</li>
+<li><code>buildInputs</code>(optional): Additional build inputs</li>
+<li><code>extraSources</code>(optional): Extra sources, allowing to use other rustFlake components
+to be used as dependencies</li>
+<li><code>extraSourcesDir</code>(default=.extras): Folder to store extra source libraries</li>
+<li><code>data</code>(optional): Data dependencies</li>
+<li><code>dataDir</code>(default=data): Folder to store the data dependencies</li>
+<li><code>devShellHook</code>(optional): Shell script executed after entering the dev shell</li>
+<li><code>devShellTools</code>(optional): Packages made available in the dev shell</li>
+<li><code>testTools</code>(optional): Packages made available in checks and the dev shell</li>
+<li><code>cargoNextestExtraArgs</code>(optional): Extra cargo nextest arguments</li>
+<li><code>doInstallCargoArtifacts</code>(optional): Controls whether cargo’s target directory
+should be copied as an output</li>
+<li><code>target</code>(default=pkgs.stdenv.hostPlatform.config): Rust compilation target</li>
+<li><code>extraRustcFlags</code>(optional): Extra rustc flags</li>
+<li><code>extraCargoArgs</code>(optional): Extra cargo arguments</li>
+<li><code>extraEnvVars</code>(optional): Extra environment variables</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>Returns an attribute set of the form</p>
+<pre><code class="language-nix">{
+  devShells."dev-${name}-rust" = derivation { ... };
+  packages."${name}-rust" = derivation { ... };
+  packages."${name}-rust-src" = derivation { ... };
+  packages."${name}-rust-build-env" = derivation { ... };
+  packages."${name}-rust-doc" = derivation { ... };
+  checks."${name}-rust-test" = derivation { ... };
+  checks."${name}-rust-clippy" = derivation { ... };
+}
+</code></pre>
+<p>where</p>
+<ul>
+<li><code>packages."${name}-rust"</code> contains the binary executable of the project.</li>
+<li><code>packages."${name}-rust-src"</code> contains the source folder, to be used as a
+dependency of other application in extraSources</li>
+<li><code>packages."${name}-rust-build-env"</code> contains the source folder, to be used
+as a standalone library (not is extraSources)</li>
+<li><code>packages."${name}-rust-doc"</code> contains the API references document</li>
+<li><code>checks."${name}-rust-test"</code> runs tests using cargo nextest</li>
+<li><code>checks."${name}-rust-clippy"</code> runs clippy</li>
+</ul>
 <p><em>Type:</em>
 function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
 <p><em>Default:</em>
-<code>&lt;function, args: {buildInputs?, cargoNextestExtraArgs?, crane?, crateName, data?, dataDir?, devShellHook?, devShellTools?, doInstallCargoArtifacts?, extraCargoArgs?, extraEnvVars?, extraRustcFlags?, extraSourceFilters?, extraSources?, extraSourcesDir?, nativeBuildInputs?, rustProfile?, rustVersion?, src, target?, testTools?, version?}&gt;</code></p>
+<code>&lt;function, args: {buildInputs?, cargoNextestExtraArgs?, crane?, crateName, data?, dataDir?, devShellHook?, devShellTools?, doInstallCargoArtifacts?, extraCargoArgs?, extraEnvVars?, extraRustcFlags?, extraSourceFilters?, extraSources?, extraSourcesDir?, nativeBuildInputs?, rustChannel?, rustProfile?, rustVersion?, src, target?, testTools?, version?}&gt;</code></p>
 <p><em>Example:</em></p>
 <pre><code>''
-  TODO(jaredponn): write down an example here
+  { ... }: {
+    perSystem = { config, ... }:
+  
+      let
+        rustFlake = config.lib.rustFlake
+          {
+            src = ./.;
+            crateName = "rust-flake-project";
+  
+            devShellHook = config.settings.shell.hook;
+  
+          };
+      in
+      {
+  
+        inherit (rustFlake) packages checks devShells;
+  
+      };
+  }
 ''
 </code></pre>
 <p><em>Declared by:</em></p>
