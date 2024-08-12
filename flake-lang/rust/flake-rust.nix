@@ -1,37 +1,70 @@
 inputCrane: pkgs:
 
-{ src
-, extraSourceFilters ? [ ]
-, crane ? null
-, crateName
-, version ? "v0"
-, rustProfile ? "stable"
-, rustVersion ? "latest"
-, nativeBuildInputs ? [ ]
-, buildInputs ? [ ]
-, extraSources ? [ ]
-, extraSourcesDir ? ".extras"
-, data ? [ ]
-, dataDir ? "data"
-, devShellHook ? ""
-, devShellTools ? [ ]
-, testTools ? [ ]
-, cargoNextestExtraArgs ? ""
-, doInstallCargoArtifacts ? false
-, target ? pkgs.stdenv.hostPlatform.config
-, extraRustcFlags ? null
-, extraCargoArgs ? null
-, extraEnvVars ? null
+{
+  # Source folder (unfiltered)
+  src
+, # Extra filters to add non-rust related files to the derivation
+  extraSourceFilters ? [ ]
+, crane ? null # deprecated
+, # Name of the project
+  crateName
+, # Major version of the project
+  version ? "v0"
+, # Rust channel (stable, nightly, etc.)
+  rustChannel ? "stable"
+, rustProfile ? null # deprecated
+, # Rust version
+  rustVersion ? "latest"
+, # Additional native build inputs
+  nativeBuildInputs ? [ ]
+, # Additional build inputs
+  buildInputs ? [ ]
+, # Extra sources, allowing to use other rustFlake components to be used as dependencies
+  extraSources ? [ ]
+, # Folder to store extra source libraries
+  extraSourcesDir ? ".extras"
+, # Data dependencies
+  data ? [ ]
+, # Folder to store the data dependencies
+  dataDir ? "data"
+, # Shell script executed after entering the dev shell
+  devShellHook ? ""
+, # Packages made available in the dev shell
+  devShellTools ? [ ]
+, # Packages made available in checks and the dev shell
+  testTools ? [ ]
+, # Extra cargo nextest arguments
+  cargoNextestExtraArgs ? ""
+, # Controls whether cargo's target directory should be copied as an output
+  doInstallCargoArtifacts ? false
+, # Rust compilation target
+  target ? pkgs.stdenv.hostPlatform.config
+, # Extra rustc flags
+  extraRustcFlags ? null
+, # Extra cargo arguments
+  extraCargoArgs ? null
+, # Extra environment variables
+  extraEnvVars ? null
 }:
 
 let
   inherit (pkgs.lib) optionalAttrs;
 
-  rustWithTools = pkgs.rust-bin.${rustProfile}.${rustVersion}.default.override
-    {
-      extensions = [ "rustfmt" "rust-analyzer" "clippy" "rust-src" ];
-      targets = [ target ];
-    };
+  rustWithTools =
+    let
+      rustChannel' =
+        if rustProfile == null
+        then rustChannel
+        else
+          pkgs.lib.showWarnings
+            [ ''rustFlake: The `rustProfile` argument is deprecated, please use `rustChannel` instead'' ]
+            rustProfile;
+    in
+    pkgs.rust-bin.${rustChannel'}.${rustVersion}.default.override
+      {
+        extensions = [ "rustfmt" "rust-analyzer" "clippy" "rust-src" ];
+        targets = [ target ];
+      };
 
   craneLib =
     let
@@ -39,7 +72,9 @@ let
         if crane == null then
           inputCrane
         else
-          pkgs.lib.showWarnings [ ''rustFlake: You're setting the `crane` argument which is deprecated and will be removed in the next major revision'' ] crane;
+          pkgs.lib.showWarnings
+            [ ''rustFlake: You're setting the `crane` argument which is deprecated and will be removed in the next major revision'' ]
+            crane;
 
     in
     (crane'.mkLib pkgs).overrideToolchain rustWithTools;
