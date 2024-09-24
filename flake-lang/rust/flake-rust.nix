@@ -45,6 +45,8 @@ inputCrane: pkgs:
   extraCargoArgs ? null
 , # Extra environment variables
   extraEnvVars ? null
+  # Generate Rustdoc
+, generateDocs ? true
 }:
 
 let
@@ -193,18 +195,20 @@ in
     '';
   };
 
-  packages = {
+  packages = (pkgs.lib.optionalAttrs generateDocs {
+    "${crateName}-rust-doc" = craneLib.cargoDoc (commonArgs // {
+      inherit cargoArtifacts;
+      doCheck = false;
+      inherit doInstallCargoArtifacts;
+    });
+
+  }) // {
     "${crateName}-rust" = craneLib.buildPackage (commonArgs // {
       inherit cargoArtifacts;
       doCheck = false;
       inherit doInstallCargoArtifacts;
     });
 
-    "${crateName}-rust-doc" = craneLib.cargoDoc (commonArgs // {
-      inherit cargoArtifacts;
-      doCheck = false;
-      inherit doInstallCargoArtifacts;
-    });
 
     "${crateName}-rust-src" = vendoredSrc;
 

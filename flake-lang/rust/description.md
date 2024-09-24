@@ -30,6 +30,7 @@ Creates a flake for a Rust project.
 - `extraRustcFlags`(optional): Extra rustc flags
 - `extraCargoArgs`(optional): Extra cargo arguments
 - `extraEnvVars`(optional): Extra environment variables
+- `generateDocs`(default=true): Generate Rustdoc
 
 **Returns:**
 
