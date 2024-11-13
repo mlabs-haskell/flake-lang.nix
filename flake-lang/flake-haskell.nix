@@ -22,12 +22,13 @@ let
         extraHackage = dependencies;
         modules = [
           (_: {
-            packages = {
+            packages.${name} = {
               allComponent.doHoogle = true;
               allComponent.doHaddock = true;
 
+
               # Enable strict compilation
-              "${name}".configureFlags = [ "-f-dev" ];
+              configureFlags = [ "-f-dev" ];
             };
           })
         ];

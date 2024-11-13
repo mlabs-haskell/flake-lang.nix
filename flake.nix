@@ -45,15 +45,11 @@
     ## Some crypto overlays necessary for Plutus
     iohk-nix.url = "github:input-output-hk/iohk-nix";
 
-    ## Foundational Plutus library
-    plutus.url = "github:input-output-hk/plutus";
-
     ## Plutarch eDSL
     plutarch = {
-      url = "github:plutonomicon/plutarch-plutus";
+      url = "github:plutonomicon/plutarch-plutus?ref=staging";
       flake = false;
     };
-
   };
 
   outputs = inputs@{ flake-parts, ... }:
