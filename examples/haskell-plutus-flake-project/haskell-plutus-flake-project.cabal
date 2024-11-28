@@ -18,15 +18,33 @@ extra-doc-files: CHANGELOG.md
 -- extra-source-files:
 
 common warnings
-  ghc-options: -Wall
+  ghc-options:        -Wall
+  default-extensions:
+    DataKinds
+    FlexibleContexts
+    ImportQualifiedPost
+    NoImplicitPrelude
+    ScopedTypeVariables
+    TemplateHaskell
+    TypeApplications
+    TypeFamilies
+    TypeOperators
 
 library
   import:           warnings
-  exposed-modules:  MyLib
+  exposed-modules:  Validator
 
   -- other-modules:
   -- other-extensions:
-  build-depends:    base
+  build-depends:
+    , base
+    , bytestring
+    , plutus-core
+    , plutus-ledger-api
+    , plutus-tx
+    , plutus-tx-plugin
+    , serialise
+
   hs-source-dirs:   src
   default-language: Haskell2010
 
@@ -38,7 +56,10 @@ executable haskell-plutus-flake-project
   -- other-extensions:
   build-depends:
     , base
-    , haskell-flake-project
+    , bytestring
+    , haskell-plutus-flake-project
+    , hex
+    , plutus-tx
 
   hs-source-dirs:   app
   default-language: Haskell2010
@@ -54,4 +75,4 @@ test-suite haskell-plutus-flake-project-test
   main-is:          Main.hs
   build-depends:
     , base
-    , haskell-flake-project
+    , haskell-plutus-flake-project
