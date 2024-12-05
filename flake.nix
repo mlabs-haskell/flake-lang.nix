@@ -73,6 +73,8 @@
         ./examples/build.nix
         # Documentation
         ./docs/build.nix
+        # Templates
+        ./templates/build.nix
       ];
     });
 }
