@@ -27,3 +27,4 @@ cabal.sandbox.config
 .HTF/
 .ghc.environment.*
 .direnv/
+dist-newstyle/
