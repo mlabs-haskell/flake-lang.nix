@@ -6,7 +6,7 @@ let
     , name
     , dependencies ? [ ]
     , devShellTools ? [ ]
-    , devShellHook
+    , devShellHook ? ""
     , devShellAdditionalPackages ? _: [ ]
     , index-state
     , compiler-nix-name
