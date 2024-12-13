@@ -40,7 +40,7 @@
           default = flake-parts-lib.importApply ./pre-commit-hooks/rust-monorepo.nix { inherit withSystem; };
           readOnly = true;
           description = ''pre-commit-hooks.nix hook for Rust in a monorepo setting'';
-          example = lib.mdDoc ''TODO(bladyjoker)'';
+          example = ''TODO(bladyjoker)'';
         };
 
       };
@@ -55,7 +55,7 @@
             description = ''
               TODO(jaredponn): write down documentation here
             '';
-            example = lib.mdDoc ''
+            example = ''
               TODO(jaredponn): write down an example here
             '';
           };
@@ -73,7 +73,7 @@
             default = import ./haskell-data.nix pkgs;
             readOnly = true;
             description = ''Makes a derivation containing a Haskell Cabal package with data modules (using Cabal data stanzas)'';
-            example = lib.mdDoc ''
+            example = ''
               ```haskell
                 haskellData {
                   srcs = [ ./. ];
@@ -91,7 +91,7 @@
             description = ''
               TODO(jaredponn): write down documentation here
             '';
-            example = lib.mdDoc ''
+            example = ''
               TODO(jaredponn): write down an example here
             '';
           };
@@ -103,7 +103,7 @@
             description = ''
               TODO(jaredponn): write down documentation here
             '';
-            example = lib.mdDoc ''
+            example = ''
               TODO(jaredponn): write down an example here
             '';
           };
@@ -113,7 +113,7 @@
             default = import ./typescript/flake-typescript.nix pkgs;
             readOnly = true;
             description = builtins.readFile ./typescript/description.md;
-            example = lib.mdDoc ''TODO(jaredponn)'';
+            example = ''TODO(jaredponn)'';
           };
 
         };
