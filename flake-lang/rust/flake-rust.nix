@@ -47,6 +47,10 @@ inputCrane: pkgs:
   extraEnvVars ? null
   # Generate Rustdoc
 , generateDocs ? true
+  # Run testsuite using cargo-nextest
+, runTests ? true
+  # Run clippy linter
+, runClippy ? true
 }:
 
 let
@@ -195,7 +199,7 @@ in
     '';
   };
 
-  packages = (pkgs.lib.optionalAttrs generateDocs {
+  packages = (optionalAttrs generateDocs {
     "${crateName}-rust-doc" = craneLib.cargoDoc (commonArgs // {
       inherit cargoArtifacts;
       doCheck = false;
@@ -215,14 +219,16 @@ in
     "${crateName}-rust-build-env" = buildEnv;
   };
 
-  checks = {
-    "${crateName}-rust-test" = craneLib.cargoNextest (commonArgs // {
-      inherit cargoArtifacts cargoNextestExtraArgs;
-      nativeBuildInputs = commonArgs.nativeBuildInputs ++ testTools;
-    });
+  checks =
+    (optionalAttrs runTests {
+      "${crateName}-rust-test" = craneLib.cargoNextest (commonArgs // {
+        inherit cargoArtifacts cargoNextestExtraArgs;
+        nativeBuildInputs = commonArgs.nativeBuildInputs ++ testTools;
+      });
+    }) // (optionalAttrs runClippy {
 
-    "${crateName}-rust-clippy" = craneLib.cargoClippy (commonArgs // {
-      inherit cargoArtifacts;
+      "${crateName}-rust-clippy" = craneLib.cargoClippy (commonArgs // {
+        inherit cargoArtifacts;
+      });
     });
-  };
 }
