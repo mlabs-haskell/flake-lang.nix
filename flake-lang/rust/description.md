@@ -32,7 +32,7 @@ Creates a flake for a Rust project.
 - `extraEnvVars`(optional): Extra environment variables
 - `generateDocs`(default=true): Generate Rustdoc
 - `runTests`(default=true): Run testsuite using cargo-nextest
-- `runClippy(default=true): Run clippy linter
+- `runClippy`(default=true): Run clippy linter
 
 **Returns:**
 
