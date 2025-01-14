@@ -31,6 +31,8 @@ Creates a flake for a Rust project.
 - `extraCargoArgs`(optional): Extra cargo arguments
 - `extraEnvVars`(optional): Extra environment variables
 - `generateDocs`(default=true): Generate Rustdoc
+- `runTests`(default=true): Run testsuite using cargo-nextest
+- `runClippy`(default=true): Run clippy linter
 
 **Returns:**
 
