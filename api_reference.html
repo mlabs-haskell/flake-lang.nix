@@ -248,6 +248,8 @@ should be copied as an output</li>
 <li><code>extraCargoArgs</code>(optional): Extra cargo arguments</li>
 <li><code>extraEnvVars</code>(optional): Extra environment variables</li>
 <li><code>generateDocs</code>(default=true): Generate Rustdoc</li>
+<li><code>runTests</code>(default=true): Run testsuite using cargo-nextest</li>
+<li><code>runClippy</code>(default=true): Run clippy linter</li>
 </ul>
 <p><strong>Returns:</strong></p>
 <p>Returns an attribute set of the form</p>
@@ -275,7 +277,7 @@ as a standalone library (not is extraSources)</li>
 <p><em>Type:</em>
 function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
 <p><em>Default:</em>
-<code>&lt;function, args: {buildInputs?, cargoNextestExtraArgs?, crane?, crateName, data?, dataDir?, devShellHook?, devShellTools?, doInstallCargoArtifacts?, extraCargoArgs?, extraEnvVars?, extraRustcFlags?, extraSourceFilters?, extraSources?, extraSourcesDir?, generateDocs?, nativeBuildInputs?, rustChannel?, rustProfile?, rustVersion?, src, target?, testTools?, version?}&gt;</code></p>
+<code>&lt;function, args: {buildInputs?, cargoNextestExtraArgs?, crane?, crateName, data?, dataDir?, devShellHook?, devShellTools?, doInstallCargoArtifacts?, extraCargoArgs?, extraEnvVars?, extraRustcFlags?, extraSourceFilters?, extraSources?, extraSourcesDir?, generateDocs?, nativeBuildInputs?, runClippy?, runTests?, rustChannel?, rustProfile?, rustVersion?, src, target?, testTools?, version?}&gt;</code></p>
 <p><em>Example:</em></p>
 <pre><code>''
   { ... }: {
