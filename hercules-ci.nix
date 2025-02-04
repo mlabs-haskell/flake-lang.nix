@@ -21,5 +21,5 @@
     hercules-ci.github-pages.settings.contents = config.packages.docs;
   };
 
-  herculesCI.ciSystems = [ "x86_64-linux" ];
+  herculesCI.ciSystems = [ "x86_64-linux" "aarch64-linux" ];
 }
