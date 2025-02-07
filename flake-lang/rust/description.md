@@ -33,6 +33,7 @@ Creates a flake for a Rust project.
 - `generateDocs`(default=true): Generate Rustdoc
 - `runTests`(default=true): Run testsuite using cargo-nextest
 - `runClippy`(default=true): Run clippy linter
+- `exportTests`(default=false): Build testsuite as standalone executables
 
 **Returns:**
 

@@ -8,7 +8,7 @@
           crateName = "rust-flake-project";
 
           devShellHook = config.settings.shell.hook;
-
+          exportTests = true;
         };
     in
     {
