@@ -211,6 +211,7 @@ in
   }) // (optionalAttrs exportTests {
     "${crateName}-rust-test" = craneLib.buildPackage (commonArgs // {
       inherit cargoArtifacts;
+      doCheck = false;
       cargoExtraArgs = cargoNextestExtraArgs + " --tests";
       nativeBuildInputs = commonArgs.nativeBuildInputs ++ testTools ++ [ pkgs.jq ];
       installPhaseCommand = ''
