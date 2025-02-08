@@ -212,13 +212,22 @@ in
     "${crateName}-rust-test" = craneLib.buildPackage (commonArgs // {
       inherit cargoArtifacts;
       doCheck = false;
+      buildInputs = [ pkgs.bash ];
       cargoExtraArgs = cargoNextestExtraArgs + " --tests";
       nativeBuildInputs = commonArgs.nativeBuildInputs ++ testTools ++ [ pkgs.jq ];
       installPhaseCommand = ''
-        files=$(cat $cargoBuildLog | jq 'select(.target.kind | . != null and contains(["test"])).executable')
+        files=$(cat $cargoBuildLog | jq -r 'select(.target.kind | . != null and contains(["test"])).executable')
         mkdir -p $out/bin
 
         echo $files | xargs -r mv -t $out/bin
+
+        echo "#!${pkgs.bash}/bin/bash" > $out/bin/run_tests.sh
+        echo "set -e" >> $out/bin/run_tests.sh
+
+        for file in $files; do
+          echo $out/bin/$(basename $file) >> $out/bin/run_tests.sh
+        done
+        chmod a+x $out/bin/run_tests.sh
       '';
     });
   }) // {
