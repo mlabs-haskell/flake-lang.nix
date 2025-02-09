@@ -212,7 +212,7 @@ in
     "${crateName}-rust-test" = craneLib.buildPackage (commonArgs // {
       inherit cargoArtifacts;
       doCheck = false;
-      buildInputs = [ pkgs.bash ];
+      buildInputs = commonArgs.buildInputs ++ [ pkgs.bash ];
       cargoExtraArgs = cargoNextestExtraArgs + " --tests";
       nativeBuildInputs = commonArgs.nativeBuildInputs ++ testTools ++ [ pkgs.jq ];
       installPhaseCommand = ''
