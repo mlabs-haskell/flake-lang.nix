@@ -250,6 +250,7 @@ should be copied as an output</li>
 <li><code>generateDocs</code>(default=true): Generate Rustdoc</li>
 <li><code>runTests</code>(default=true): Run testsuite using cargo-nextest</li>
 <li><code>runClippy</code>(default=true): Run clippy linter</li>
+<li><code>exportTests</code>(default=false): Build testsuite as standalone executables</li>
 </ul>
 <p><strong>Returns:</strong></p>
 <p>Returns an attribute set of the form</p>
@@ -277,7 +278,7 @@ as a standalone library (not is extraSources)</li>
 <p><em>Type:</em>
 function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
 <p><em>Default:</em>
-<code>&lt;function, args: {buildInputs?, cargoNextestExtraArgs?, crane?, crateName, data?, dataDir?, devShellHook?, devShellTools?, doInstallCargoArtifacts?, extraCargoArgs?, extraEnvVars?, extraRustcFlags?, extraSourceFilters?, extraSources?, extraSourcesDir?, generateDocs?, nativeBuildInputs?, runClippy?, runTests?, rustChannel?, rustProfile?, rustVersion?, src, target?, testTools?, version?}&gt;</code></p>
+<code>&lt;function, args: {buildInputs?, cargoNextestExtraArgs?, crane?, crateName, data?, dataDir?, devShellHook?, devShellTools?, doInstallCargoArtifacts?, exportTests?, extraCargoArgs?, extraEnvVars?, extraRustcFlags?, extraSourceFilters?, extraSources?, extraSourcesDir?, generateDocs?, nativeBuildInputs?, runClippy?, runTests?, rustChannel?, rustProfile?, rustVersion?, src, target?, testTools?, version?}&gt;</code></p>
 <p><em>Example:</em></p>
 <pre><code>''
   { ... }: {
@@ -290,7 +291,7 @@ function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
             crateName = "rust-flake-project";
   
             devShellHook = config.settings.shell.hook;
-  
+            exportTests = true;
           };
       in
       {
