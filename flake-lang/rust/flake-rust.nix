@@ -47,6 +47,8 @@ inputCrane: pkgs:
   extraEnvVars ? null
   # Generate Rustdoc
 , generateDocs ? true
+  # Build testsuite as standalone executables
+, exportTests ? false
   # Run testsuite using cargo-nextest
 , runTests ? true
   # Run clippy linter
@@ -206,6 +208,28 @@ in
       inherit doInstallCargoArtifacts;
     });
 
+  }) // (optionalAttrs exportTests {
+    "${crateName}-rust-test" = craneLib.buildPackage (commonArgs // {
+      inherit cargoArtifacts;
+      doCheck = false;
+      buildInputs = commonArgs.buildInputs ++ [ pkgs.bash ];
+      cargoExtraArgs = cargoNextestExtraArgs + " --tests";
+      nativeBuildInputs = commonArgs.nativeBuildInputs ++ testTools ++ [ pkgs.jq ];
+      installPhaseCommand = ''
+        files=$(cat $cargoBuildLog | jq -r 'select(.target.kind | . != null and contains(["test"])).executable')
+        mkdir -p $out/bin
+
+        echo $files | xargs -r mv -t $out/bin
+
+        echo "#!${pkgs.bash}/bin/bash" > $out/bin/run_tests.sh
+        echo "set -e" >> $out/bin/run_tests.sh
+
+        for file in $files; do
+          echo $out/bin/$(basename $file) >> $out/bin/run_tests.sh
+        done
+        chmod a+x $out/bin/run_tests.sh
+      '';
+    });
   }) // {
     "${crateName}-rust" = craneLib.buildPackage (commonArgs // {
       inherit cargoArtifacts;
@@ -217,6 +241,7 @@ in
     "${crateName}-rust-src" = vendoredSrc;
 
     "${crateName}-rust-build-env" = buildEnv;
+
   };
 
   checks =
