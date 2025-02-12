@@ -10,7 +10,7 @@
     {
       inherit (hsFlake) packages checks;
 
-      // TODO(chfanghr): Unify the names of dev shells of different lanuages
+      # TODO(chfanghr): Unify the names of dev shells of different languages
       devShells.dev-example-haskell = hsFlake.devShell;
     };
 }
