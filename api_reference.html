@@ -284,18 +284,19 @@ function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
 <code>&lt;function, args: {buildInputs?, cargoNextestExtraArgs?, crane?, crateName, data?, dataDir?, devShellHook?, devShellTools?, doInstallCargoArtifacts?, exportTests?, extraCargoArgs?, extraEnvVars?, extraRustcFlags?, extraSourceFilters?, extraSources?, extraSourcesDir?, generateDocs?, nativeBuildInputs?, runClippy?, runTests?, rustChannel?, rustProfile?, rustVersion?, src, target?, testTools?, version?}&gt;</code></p>
 <p><em>Example:</em></p>
 <pre><code>''
-  { ... }: {
-    perSystem = { config, ... }:
+  { ... }:
+  {
+    perSystem =
+      { config, ... }:
   
       let
-        rustFlake = config.lib.rustFlake
-          {
-            src = ./.;
-            crateName = "rust-flake-project";
+        rustFlake = config.lib.rustFlake {
+          src = ./.;
+          crateName = "rust-flake-project";
   
-            devShellHook = config.settings.shell.hook;
-            exportTests = true;
-          };
+          devShellHook = config.settings.shell.hook;
+          exportTests = true;
+        };
       in
       {
   
