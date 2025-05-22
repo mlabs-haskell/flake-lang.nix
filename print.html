@@ -250,7 +250,9 @@ to be used as dependencies</li>
 <li><code>cargoNextestExtraArgs</code>(optional): Extra cargo nextest arguments</li>
 <li><code>doInstallCargoArtifacts</code>(optional): Controls whether cargo’s target directory
 should be copied as an output</li>
-<li><code>target</code>(default=pkgs.stdenv.hostPlatform.config): Rust compilation target</li>
+<li><code>target</code> (optional): Main Rust compilation target
+(Rust will figure out by default)</li>
+<li><code>extraTargets</code>(optional): Extra Rust compilation targets</li>
 <li><code>extraRustcFlags</code>(optional): Extra rustc flags</li>
 <li><code>extraCargoArgs</code>(optional): Extra cargo arguments</li>
 <li><code>extraEnvVars</code>(optional): Extra environment variables</li>
@@ -285,7 +287,7 @@ as a standalone library (not is extraSources)</li>
 <p><em>Type:</em>
 function that evaluates to a(n) (attribute set) <em>(read only)</em></p>
 <p><em>Default:</em>
-<code>&lt;function, args: {buildInputs?, cargoNextestExtraArgs?, crane?, crateName, data?, dataDir?, devShellHook?, devShellTools?, doInstallCargoArtifacts?, exportTests?, extraCargoArgs?, extraEnvVars?, extraRustcFlags?, extraSourceFilters?, extraSources?, extraSourcesDir?, generateDocs?, nativeBuildInputs?, runClippy?, runTests?, rustChannel?, rustProfile?, rustVersion?, src, target?, testTools?, version?}&gt;</code></p>
+<code>&lt;function, args: {buildInputs?, cargoNextestExtraArgs?, crane?, crateName, data?, dataDir?, devShellHook?, devShellTools?, doInstallCargoArtifacts?, exportTests?, extraCargoArgs?, extraEnvVars?, extraRustcFlags?, extraSourceFilters?, extraSources?, extraSourcesDir?, extraTargets?, generateDocs?, nativeBuildInputs?, runClippy?, runTests?, rustChannel?, rustProfile?, rustVersion?, src, target?, testTools?, version?}&gt;</code></p>
 <p><em>Example:</em></p>
 <pre><code>''
   { ... }:
