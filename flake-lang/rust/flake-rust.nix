@@ -5,14 +5,16 @@ inputCrane: pkgs:
   src,
   # Extra filters to add non-rust related files to the derivation
   extraSourceFilters ? [ ],
-  crane ? null, # deprecated
+  crane ? null,
+  # deprecated
   # Name of the project
   crateName,
   # Major version of the project
   version ? "v0",
   # Rust channel (stable, nightly, etc.)
   rustChannel ? "stable",
-  rustProfile ? null, # deprecated
+  rustProfile ? null,
+  # deprecated
   # Rust version
   rustVersion ? "latest",
   # Additional native build inputs
@@ -37,8 +39,10 @@ inputCrane: pkgs:
   cargoNextestExtraArgs ? "",
   # Controls whether cargo's target directory should be copied as an output
   doInstallCargoArtifacts ? false,
-  # Rust compilation target
-  target ? pkgs.stdenv.hostPlatform.config,
+  # Main Rust compilation target (Rust will figure out by default)
+  target ? null,
+  # Extra Rust compilation targets
+  extraTargets ? [ ],
   # Extra rustc flags
   extraRustcFlags ? null,
   # Extra cargo arguments
@@ -75,7 +79,7 @@ let
         "clippy"
         "rust-src"
       ];
-      targets = [ target ];
+      targets = (pkgs.lib.optional (target != null) target) ++ extraTargets;
     };
 
   craneLib =
@@ -138,8 +142,6 @@ let
     ])
     ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
       pkgs.gcc
-      pkgs.darwin.apple_sdk.frameworks.Security
-      pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
     ]);
   defBuildInputs = [
     pkgs.openssl.dev
