@@ -1,13 +1,14 @@
 <!-- This file is used in `../build.nix`'s `description` for Rust -->
 
 <!-- markdownlint-disable MD041 -->
+
 Creates a flake for a Rust project.
 
 **Arguments:**
 
 - `src`: Source folder (unfiltered)
 - `extraSourceFilters`(optional): Extra filters to add non-rust related files to
-   the derivation
+  the derivation
 - `crane`(optional): Crane version to be used
 - `crateName`: Name of the project
 - `version`: Major version of the project
@@ -26,7 +27,9 @@ Creates a flake for a Rust project.
 - `cargoNextestExtraArgs`(optional): Extra cargo nextest arguments
 - `doInstallCargoArtifacts`(optional): Controls whether cargo's target directory
   should be copied as an output
-- `target`(default=pkgs.stdenv.hostPlatform.config): Rust compilation target
+- `target` (optional): Main Rust compilation target
+  (Rust will figure out by default)
+- `extraTargets`(optional): Extra Rust compilation targets
 - `extraRustcFlags`(optional): Extra rustc flags
 - `extraCargoArgs`(optional): Extra cargo arguments
 - `extraEnvVars`(optional): Extra environment variables
