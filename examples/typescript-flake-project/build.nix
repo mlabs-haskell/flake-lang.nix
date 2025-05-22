@@ -1,17 +1,17 @@
 { ... }:
 {
-  perSystem = { config, ... }:
+  perSystem =
+    { config, ... }:
     let
-      typescriptFlake =
-        config.lib.typescriptFlake {
-          name = "typescript-flake-project";
-          src = ./.;
+      typescriptFlake = config.lib.typescriptFlake {
+        name = "typescript-flake-project";
+        src = ./.;
 
-          devShellTools = config.settings.shell.tools;
-          devShellHook = config.settings.shell.hook;
+        devShellTools = config.settings.shell.tools;
+        devShellHook = config.settings.shell.hook;
 
-          npmExtraDependencies = [ ];
-        };
+        npmExtraDependencies = [ ];
+      };
     in
     {
       packages = {
@@ -19,7 +19,8 @@
           typescript-flake-project-typescript
           typescript-flake-project-typescript-lib
           typescript-flake-project-typescript-tgz
-          typescript-flake-project-typescript-node2nix;
+          typescript-flake-project-typescript-node2nix
+          ;
       };
 
       inherit (typescriptFlake) checks devShells;

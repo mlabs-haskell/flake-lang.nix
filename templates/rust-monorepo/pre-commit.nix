@@ -1,13 +1,15 @@
-{ inputs, ... }: {
+{ inputs, ... }:
+{
   imports = [
     inputs.pre-commit-hooks.flakeModule
     inputs.flake-lang.flakeModules.rustMonorepoPreCommit
   ];
 
-  perSystem = { config, ... }:
+  perSystem =
+    { config, ... }:
     {
       pre-commit.settings.hooks = {
-        nixpkgs-fmt.enable = true;
+        nixfmt-rfc-style.enable = true;
         deadnix.enable = true;
         rustfmt-monorepo.enable = true;
         typos.enable = true;

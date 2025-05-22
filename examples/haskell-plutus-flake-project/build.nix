@@ -1,6 +1,6 @@
-_:
-{
-  perSystem = { config, pkgs, ... }:
+_: {
+  perSystem =
+    { config, pkgs, ... }:
     let
       hsFlake = config.lib.haskellPlutusFlake {
         src = ./.;
@@ -17,10 +17,15 @@ _:
 
     {
       checks =
-        pkgs.lib.attrsets.mapAttrs' (k: v: pkgs.lib.attrsets.nameValuePair ("package:${k}") v) hsFlake.packages
-        // pkgs.lib.attrsets.mapAttrs' (k: v: pkgs.lib.attrsets.nameValuePair ("checks:${k}") v) hsFlake.checks
-        // { "devShells:haskell-plutus-flake-project" = hsFlake.devShell; };
-
+        pkgs.lib.attrsets.mapAttrs' (
+          k: v: pkgs.lib.attrsets.nameValuePair ("package:${k}") v
+        ) hsFlake.packages
+        // pkgs.lib.attrsets.mapAttrs' (
+          k: v: pkgs.lib.attrsets.nameValuePair ("checks:${k}") v
+        ) hsFlake.checks
+        // {
+          "devShells:haskell-plutus-flake-project" = hsFlake.devShell;
+        };
 
       devShells.dev-haskell-plutus-flake-project = hsFlake.devShell;
     };

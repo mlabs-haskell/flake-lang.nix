@@ -1,5 +1,7 @@
-{ inputs, ... }: {
-  perSystem = { system, config, ... }:
+{ inputs, ... }:
+{
+  perSystem =
+    { system, config, ... }:
     let
       hsFlake = inputs.flake-lang.lib.${system}.haskellFlake {
         src = ./.;

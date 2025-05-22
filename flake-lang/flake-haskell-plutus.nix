@@ -3,9 +3,12 @@ cardano-haskell-packages: pkgs: opts:
 let
   plutusMod = (import ./haskell.nix/plutus.nix) opts.compiler-nix-name cardano-haskell-packages;
   opts' =
-    if "modules" ? opts then opts // {
-      modules = opts.modules ++ [ plutusMod ];
-    }
-    else opts // { modules = [ plutusMod ]; };
+    if "modules" ? opts then
+      opts
+      // {
+        modules = opts.modules ++ [ plutusMod ];
+      }
+    else
+      opts // { modules = [ plutusMod ]; };
 in
 (import ./flake-haskell.nix pkgs) opts'
