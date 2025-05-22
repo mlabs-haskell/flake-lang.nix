@@ -1,11 +1,12 @@
-{ inputs, ... }: {
-  perSystem = { system, ... }:
+{ inputs, ... }:
+{
+  perSystem =
+    { system, ... }:
     let
-      typescriptFlake =
-        inputs.flake-lang.lib.${system}.typescriptFlake {
-          name = "example";
-          src = ./.;
-        };
+      typescriptFlake = inputs.flake-lang.lib.${system}.typescriptFlake {
+        name = "example";
+        src = ./.;
+      };
     in
     {
       inherit (typescriptFlake) checks packages;

@@ -52,29 +52,40 @@
     };
   };
 
-  outputs = inputs@{ flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } ({ flake-parts-lib, withSystem, ... }: {
-      systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ];
+  outputs =
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } (
+      { flake-parts-lib, withSystem, ... }:
+      {
+        systems = [
+          "x86_64-linux"
+          "x86_64-darwin"
+          "aarch64-linux"
+          "aarch64-darwin"
+        ];
 
-      imports = [
-        # Project configuration
-        ./pkgs.nix
-        ./settings.nix
+        imports = [
+          # Project configuration
+          ./pkgs.nix
+          ./settings.nix
 
-        # Code quality
-        (flake-parts-lib.importApply ./flake-lang/pre-commit-hooks/rust-monorepo.nix { inherit withSystem; })
-        ./pre-commit.nix
-        ./hercules-ci.nix
+          # Code quality
+          (flake-parts-lib.importApply ./flake-lang/pre-commit-hooks/rust-monorepo.nix {
+            inherit withSystem;
+          })
+          ./pre-commit.nix
+          ./hercules-ci.nix
 
-        # Nix tools
-        ./flake-lang/build.nix
+          # Nix tools
+          ./flake-lang/build.nix
 
-        # Examples/Tests
-        ./examples/build.nix
-        # Documentation
-        ./docs/build.nix
-        # Templates
-        ./templates/build.nix
-      ];
-    });
+          # Examples/Tests
+          ./examples/build.nix
+          # Documentation
+          ./docs/build.nix
+          # Templates
+          ./templates/build.nix
+        ];
+      }
+    );
 }

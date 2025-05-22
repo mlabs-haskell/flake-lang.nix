@@ -1,6 +1,11 @@
 # Creates a haskell.nix module that prepares a Cabal environment for building with Plutus.
 compiler-nix-name: cardano-haskell-packages:
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 let
   pkgs' = pkgs;
   module = _: {
@@ -15,7 +20,9 @@ in
     cabalProjectLocal = builtins.readFile ./cabal.project.local;
     inherit compiler-nix-name;
     modules = [ module ];
-    inputMap."https://input-output-hk.github.io/cardano-haskell-packages" = "${cardano-haskell-packages}";
+    inputMap."https://input-output-hk.github.io/cardano-haskell-packages" = "${
+      cardano-haskell-packages
+    }";
     shell = {
       withHoogle = lib.mkOverride 999 false; # FIXME set to true
       exactDeps = lib.mkOverride 999 true;

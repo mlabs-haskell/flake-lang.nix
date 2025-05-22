@@ -6,7 +6,8 @@
     pre-commit-hooks.url = "github:cachix/git-hooks.nix";
   };
 
-  outputs = inputs@{ flake-parts, ... }:
+  outputs =
+    inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "x86_64-linux"
@@ -21,8 +22,10 @@
         ./pre-commit.nix
       ];
 
-      perSystem = { config, ... }: {
-        devShells.default = config.devShells.dev-pre-commit;
-      };
+      perSystem =
+        { config, ... }:
+        {
+          devShells.default = config.devShells.dev-pre-commit;
+        };
     };
 }

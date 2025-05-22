@@ -1,5 +1,7 @@
-{ inputs, ... }: {
-  perSystem = { system, ... }:
+{ inputs, ... }:
+{
+  perSystem =
+    { system, ... }:
     let
       rustFlake = inputs.flake-lang.lib.${system}.rustFlake {
         src = ./.;

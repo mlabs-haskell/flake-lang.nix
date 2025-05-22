@@ -1,8 +1,10 @@
 # Repo wide settings
-{ lib, flake-parts-lib, ... }: {
+{ lib, flake-parts-lib, ... }:
+{
   options = {
-    perSystem = flake-parts-lib.mkPerSystemOption
-      ({ config, ... }: {
+    perSystem = flake-parts-lib.mkPerSystemOption (
+      { config, ... }:
+      {
         options.settings = {
           haskell = {
             index-state = lib.mkOption {
@@ -17,7 +19,6 @@
           };
         };
 
-
         config = {
           settings = {
             haskell = {
@@ -26,6 +27,7 @@
             };
           };
         };
-      });
+      }
+    );
   };
 }

@@ -1,5 +1,7 @@
-{ lib, ... }: {
-  perSystem = { config, pkgs, ... }:
+{ lib, ... }:
+{
+  perSystem =
+    { config, pkgs, ... }:
 
     let
       inherit (builtins) mapAttrs;
@@ -15,10 +17,13 @@
 
       rustFlake = config.lib.rustFlake commonArgs;
 
-      rustFlakeMusl = config.lib.rustFlake (commonArgs // {
-        target = "x86_64-unknown-linux-musl";
-        extraRustcFlags = "-C target-feature=+crt-static";
-      });
+      rustFlakeMusl = config.lib.rustFlake (
+        commonArgs
+        // {
+          target = "x86_64-unknown-linux-musl";
+          extraRustcFlags = "-C target-feature=+crt-static";
+        }
+      );
 
       addMuslSuffixToAttrNames = mapAttrs' (name: nameValuePair "${name}-musl");
 

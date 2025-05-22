@@ -1,7 +1,8 @@
 pkgs:
-{ name
-, src
-, # `dependencies` is of type
+{
+  name,
+  src,
+  # `dependencies` is of type
   # ```
   # [ file or folder ]
   # ```
@@ -28,74 +29,77 @@ pkgs:
   # in ...
   # ```
 
-  npmExtraDependencies ? [ ]
-, # The script to build the project i.e., `npm run ${npmBuildScript}` is
+  npmExtraDependencies ? [ ],
+  # The script to build the project i.e., `npm run ${npmBuildScript}` is
   # executed.
-  npmBuildScript ? "build"
-, nodejs ? pkgs.nodejs
-, # `devShellHook` is the shell commands to run _before_  entering the shell
+  npmBuildScript ? "build",
+  nodejs ? pkgs.nodejs,
+  # `devShellHook` is the shell commands to run _before_  entering the shell
   # (see the variable `shell`)
-  devShellHook ? ""
-, # `devShellTools` are extra packages one may use in the dev shell
-  devShellTools ? [ ]
-, # `testTools` are extra derivations to append to the `buildInputs` for
+  devShellHook ? "",
+  # `devShellTools` are extra packages one may use in the dev shell
+  devShellTools ? [ ],
+  # `testTools` are extra derivations to append to the `buildInputs` for
   # the tests (see the variable `test`)
-  testTools ? [ ]
-, # Extra data to include in the project `${name}-typescript` in the directory
+  testTools ? [ ],
+  # Extra data to include in the project `${name}-typescript` in the directory
   # `dataDir`.
   # Type is:
   #     - List of attribute sets like:
   #         [ { name = "name"; path = "/nix/store/..."; } ]
   # Internally, this uses `pkgs.linkFarm`.
-  data ? [ ]
-, # Name of the directory to put `data` in.
-  dataDir ? "data"
+  data ? [ ],
+  # Name of the directory to put `data` in.
+  dataDir ? "data",
 }:
-pkgs.lib.makeExtensible
-  (self: with self.__typescriptFlake__;
-  {
+pkgs.lib.makeExtensible (
+  self: with self.__typescriptFlake__; {
     ################################
     # Overlayable attributes
     # These attributes are considered internal.
     ################################
-    __typescriptFlake__ = pkgs.lib.makeExtensible (tsSelf: with tsSelf; {
-      # We assume that all dependencies have their transitive closure stored in the
-      # `npmExtraDependencies` attribute; so it follows that we can compute the
-      # transitive closure by concatenating all dependencies together.
-      # TODO(jaredponn): perhaps this should be some sort of set data structure with some sort of key...
-      npmExtraDependenciesTransitiveClosure = builtins.concatMap (dep: [ dep ] ++ (dep.npmExtraDependencies or [ ])) npmExtraDependencies;
+    __typescriptFlake__ = pkgs.lib.makeExtensible (
+      tsSelf: with tsSelf; {
+        # We assume that all dependencies have their transitive closure stored in the
+        # `npmExtraDependencies` attribute; so it follows that we can compute the
+        # transitive closure by concatenating all dependencies together.
+        # TODO(jaredponn): perhaps this should be some sort of set data structure with some sort of key...
+        npmExtraDependenciesTransitiveClosure = builtins.concatMap (
+          dep: [ dep ] ++ (dep.npmExtraDependencies or [ ])
+        ) npmExtraDependencies;
 
-      # Folder to put the extra dependencies in
-      # WARNING: we have to be a bit careful about this -- the `package.json`'s
-      # expect the dependencies to be put in a specific folder.
-      # NOTE(jaredponn): Why does this start with a `.`? This is because 
-      #     1. It makes it a hidden file
-      #     2. This no longer becomes a valid package name according to these
-      #     guys:
-      #     https://www.npmjs.com/package/validate-npm-package-name#naming-rules,
-      #     so we can safely put all of our extra dependencies in this folder
-      #     without running into troubles with node2nix later (see
-      #     `extraDependenciesForNode2nix`)
-      npmExtraDependenciesFolder = "./.extra-dependencies";
+        # Folder to put the extra dependencies in
+        # WARNING: we have to be a bit careful about this -- the `package.json`'s
+        # expect the dependencies to be put in a specific folder.
+        # NOTE(jaredponn): Why does this start with a `.`? This is because
+        #     1. It makes it a hidden file
+        #     2. This no longer becomes a valid package name according to these
+        #     guys:
+        #     https://www.npmjs.com/package/validate-npm-package-name#naming-rules,
+        #     so we can safely put all of our extra dependencies in this folder
+        #     without running into troubles with node2nix later (see
+        #     `extraDependenciesForNode2nix`)
+        npmExtraDependenciesFolder = "./.extra-dependencies";
 
-      # Creates something like
-      #  /nix/store/....-${name}-data
-      #  |-- foobar -> /nix/store/...
-      #  `-- hello-test -> /nix/store/...
-      #  see `pkgs.linkFarm` (a trivial builder) for details
-      dataLinkFarm = pkgs.linkFarm "${name}-data" data;
+        # Creates something like
+        #  /nix/store/....-${name}-data
+        #  |-- foobar -> /nix/store/...
+        #  `-- hello-test -> /nix/store/...
+        #  see `pkgs.linkFarm` (a trivial builder) for details
+        dataLinkFarm = pkgs.linkFarm "${name}-data" data;
 
-      # Directory to put the `data` in
-      dataFolder = dataDir;
+        # Directory to put the `data` in
+        dataFolder = dataDir;
 
-      # Shell script to create the dataLinkFarm in the directory `dataDir`.
-      dataLinkFarmCmd =
-        let cmdName = "${name}-data";
-        in pkgs.writeShellApplication rec {
-          name = cmdName;
-          runtimeInputs = [ ];
-          text =
-            ''
+        # Shell script to create the dataLinkFarm in the directory `dataDir`.
+        dataLinkFarmCmd =
+          let
+            cmdName = "${name}-data";
+          in
+          pkgs.writeShellApplication rec {
+            name = cmdName;
+            runtimeInputs = [ ];
+            text = ''
               printf "flake-lang.nix: %s: creating a symbolic link named \`%s\` pointing to \`%s\`\n" \
                   ${pkgs.lib.escapeShellArg name} \
                   ${pkgs.lib.escapeShellArg dataFolder} \
@@ -111,104 +115,102 @@ pkgs.lib.makeExtensible
               ln -sf ${pkgs.lib.escapeShellArg dataLinkFarm} \
                   ${pkgs.lib.escapeShellArg dataFolder}
             '';
-        };
+          };
 
-      # Creates a nix derivation with all the extra npm dependencies provided
-      # by nix.
-      mkNpmExtraDependencies =
-        pkgs.runCommand
-          "${name}-npm-extra-dependencies"
-          { }
-          ''
-            mkdir -p $out
-            cd $out
+        # Creates a nix derivation with all the extra npm dependencies provided
+        # by nix.
+        mkNpmExtraDependencies = pkgs.runCommand "${name}-npm-extra-dependencies" { } ''
+          mkdir -p $out
+          cd $out
 
-            ${builtins.concatStringsSep "\n" 
-                (builtins.map 
-                    (dep: 
-                        ''
-                        if test -d ${pkgs.lib.escapeShellArg dep}
-                        then
-                            if test -f ${pkgs.lib.escapeShellArg dep}/package.json
-                            then
-                                ln -sf ${pkgs.lib.escapeShellArg dep} .
-                            else
-                                ! test -d ${pkgs.lib.escapeShellArg dep}/tarballs \
-                                    || find ${pkgs.lib.escapeShellArg dep}/tarballs \
-                                        -mindepth 1 \
-                                        -maxdepth 1 \
-                                        -exec ln -sf '{}' . \;
+          ${builtins.concatStringsSep "\n" (
+            builtins.map (dep: ''
+              if test -d ${pkgs.lib.escapeShellArg dep}
+              then
+                  if test -f ${pkgs.lib.escapeShellArg dep}/package.json
+                  then
+                      ln -sf ${pkgs.lib.escapeShellArg dep} .
+                  else
+                      ! test -d ${pkgs.lib.escapeShellArg dep}/tarballs \
+                          || find ${pkgs.lib.escapeShellArg dep}/tarballs \
+                              -mindepth 1 \
+                              -maxdepth 1 \
+                              -exec ln -sf '{}' . \;
 
-                                ! test -d ${pkgs.lib.escapeShellArg dep}/lib/node_modules \
-                                    || find ${pkgs.lib.escapeShellArg dep}/lib/node_modules \
-                                        -mindepth 1 \
-                                        -maxdepth 1 \
-                                        -exec ln -sf '{}' . \;
-                            fi
-                        else
-                            ln -sf ${pkgs.lib.escapeShellArg dep} .
-                        fi
-                        '') 
-                        npmExtraDependenciesTransitiveClosure)
-            }
-          '';
+                      ! test -d ${pkgs.lib.escapeShellArg dep}/lib/node_modules \
+                          || find ${pkgs.lib.escapeShellArg dep}/lib/node_modules \
+                              -mindepth 1 \
+                              -maxdepth 1 \
+                              -exec ln -sf '{}' . \;
+                  fi
+              else
+                  ln -sf ${pkgs.lib.escapeShellArg dep} .
+              fi
+            '') npmExtraDependenciesTransitiveClosure
+          )}
+        '';
 
-      # Shell script to create the dependencies copied in `npmExtraDependenciesTransitiveClosure`.
-      # Normally, this is run in the `configurePhase` to add the extra sources.
-      mkNpmExtraDependenciesCmd =
-        let cmdName = "${name}-npm-extra-dependencies";
-        in pkgs.writeShellApplication rec {
-          name = cmdName;
-          runtimeInputs = [ ];
-          # NOTE(jaredponn): Why are we copying everything when symlinking
-          # might suffice?
-          # ~~~~~~~~~~~~~~~~~~~
-          # When we run `npm install some/path/which/contains/a/symlink` it'll
-          # rewrite this to the relative path of the dereferenced symlink e.g.
-          # running `npm install mypackage` for
-          # ```
-          # mypackage --> /nix/store/../somepkg
-          # ```
-          # will make `npm` write something like
-          # ```
-          # file:../../../../../nix/store/../somepkg
-          # ```
-          # in the `package.json` and `package-lock.json`
-          # Clearly, this is unusable.
-          text = ''
-            1>&2 printf "flake-lang.nix: %s: creating a copy of \`%s\` to \`%s\`\n" \
-                ${pkgs.lib.escapeShellArg name} \
-                ${pkgs.lib.escapeShellArg mkNpmExtraDependencies} \
-                ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
-
-            [[ -e ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder} ]] && \
-                  1>&2 printf "flake-lang.nix: %s: removing existing \`%s\`\n" \
-                    ${pkgs.lib.escapeShellArg name} \
-                    ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
-
-            rm -rf ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
-
-            mkdir -p ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
-            cp -f -Lr --no-preserve=all ${pkgs.lib.escapeShellArg mkNpmExtraDependencies}/. \
-                ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
-
-            # NOTE(jaredponn): perhaps in the future it will be helpful to
-            # output this
+        # Shell script to create the dependencies copied in `npmExtraDependenciesTransitiveClosure`.
+        # Normally, this is run in the `configurePhase` to add the extra sources.
+        mkNpmExtraDependenciesCmd =
+          let
+            cmdName = "${name}-npm-extra-dependencies";
+          in
+          pkgs.writeShellApplication rec {
+            name = cmdName;
+            runtimeInputs = [ ];
+            # NOTE(jaredponn): Why are we copying everything when symlinking
+            # might suffice?
+            # ~~~~~~~~~~~~~~~~~~~
+            # When we run `npm install some/path/which/contains/a/symlink` it'll
+            # rewrite this to the relative path of the dereferenced symlink e.g.
+            # running `npm install mypackage` for
             # ```
-            # echo ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
+            # mypackage --> /nix/store/../somepkg
             # ```
-          '';
-        };
+            # will make `npm` write something like
+            # ```
+            # file:../../../../../nix/store/../somepkg
+            # ```
+            # in the `package.json` and `package-lock.json`
+            # Clearly, this is unusable.
+            text = ''
+              1>&2 printf "flake-lang.nix: %s: creating a copy of \`%s\` to \`%s\`\n" \
+                  ${pkgs.lib.escapeShellArg name} \
+                  ${pkgs.lib.escapeShellArg mkNpmExtraDependencies} \
+                  ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
 
+              [[ -e ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder} ]] && \
+                    1>&2 printf "flake-lang.nix: %s: removing existing \`%s\`\n" \
+                      ${pkgs.lib.escapeShellArg name} \
+                      ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
 
-      # The result of running node2nix on the current project
-      srcWithNode2nix = pkgs.stdenv.mkDerivation {
-        name = "${name}-node2nix";
-        inherit src;
-        buildInputs = [ pkgs.node2nix nodejs mkNpmExtraDependenciesCmd dataLinkFarmCmd ];
+              rm -rf ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
 
-        configurePhase =
-          ''
+              mkdir -p ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
+              cp -f -Lr --no-preserve=all ${pkgs.lib.escapeShellArg mkNpmExtraDependencies}/. \
+                  ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
+
+              # NOTE(jaredponn): perhaps in the future it will be helpful to
+              # output this
+              # ```
+              # echo ${pkgs.lib.escapeShellArg npmExtraDependenciesFolder}
+              # ```
+            '';
+          };
+
+        # The result of running node2nix on the current project
+        srcWithNode2nix = pkgs.stdenv.mkDerivation {
+          name = "${name}-node2nix";
+          inherit src;
+          buildInputs = [
+            pkgs.node2nix
+            nodejs
+            mkNpmExtraDependenciesCmd
+            dataLinkFarmCmd
+          ];
+
+          configurePhase = ''
             runHook preConfigure
 
             ${pkgs.lib.escapeShellArg mkNpmExtraDependenciesCmd.name}
@@ -217,12 +219,11 @@ pkgs.lib.makeExtensible
             runHook postConfigure
           '';
 
-        NIX_NODE_ENV_FILE = "./node-env.nix";
-        NIX_NODE_PACKAGES_FILE = "./node-packages.nix";
-        NIX_COMPOSITION_FILE = "./default.nix";
+          NIX_NODE_ENV_FILE = "./node-env.nix";
+          NIX_NODE_PACKAGES_FILE = "./node-packages.nix";
+          NIX_COMPOSITION_FILE = "./default.nix";
 
-        buildPhase =
-          ''
+          buildPhase = ''
             runHook preBuild
 
             if ! node2nix --input ./package.json --lock ./package-lock.json --development --node-env "$NIX_NODE_ENV_FILE" --output "$NIX_NODE_PACKAGES_FILE" --composition "$NIX_COMPOSITION_FILE"
@@ -237,8 +238,7 @@ pkgs.lib.makeExtensible
             runHook postBuild
           '';
 
-        installPhase =
-          ''
+          installPhase = ''
             runHook preInstall
 
             mkdir -p "$out"
@@ -246,40 +246,48 @@ pkgs.lib.makeExtensible
 
             runHook postInstall
           '';
-      };
+        };
 
-      # Importing the resulting nix expression produced by node2nix (IFD)
-      srcWithNode2nixIfd = import "${srcWithNode2nix}/${srcWithNode2nix.NIX_COMPOSITION_FILE}" { inherit nodejs pkgs; inherit (pkgs) system; };
+        # Importing the resulting nix expression produced by node2nix (IFD)
+        srcWithNode2nixIfd = import "${srcWithNode2nix}/${srcWithNode2nix.NIX_COMPOSITION_FILE}" {
+          inherit nodejs pkgs;
+          inherit (pkgs) system;
+        };
 
-      # Important note:
-      # Inspection of the code suggests that the node_modules are put in 
-      # ```
-      # $out/lib/node_modules/${srcWithNode2nixIfd.args.packageName}/node_modules
-      # ```
-      npmPackage = srcWithNode2nixIfd.package.override (super:
-        {
-          buildInputs = super.buildInputs ++ [ mkNpmExtraDependenciesCmd dataLinkFarmCmd ];
+        # Important note:
+        # Inspection of the code suggests that the node_modules are put in
+        # ```
+        # $out/lib/node_modules/${srcWithNode2nixIfd.args.packageName}/node_modules
+        # ```
+        npmPackage = srcWithNode2nixIfd.package.override (super: {
+          buildInputs = super.buildInputs ++ [
+            mkNpmExtraDependenciesCmd
+            dataLinkFarmCmd
+          ];
         });
 
-      # Build the project (runs `npm run build`), then runs `npm install` where
-      # the install outputs are copied to "$out"
-      project = pkgs.stdenv.mkDerivation {
-        name = "${name}-typescript";
-        # Note we use `srcWithNode2nix` as the source, so this allows users to
-        # override srcWithNode2nix's source as the "root source" of all of the
-        # following derivations.
-        src = srcWithNode2nix;
-        buildInputs = [ nodejs mkNpmExtraDependenciesCmd dataLinkFarmCmd ];
+        # Build the project (runs `npm run build`), then runs `npm install` where
+        # the install outputs are copied to "$out"
+        project = pkgs.stdenv.mkDerivation {
+          name = "${name}-typescript";
+          # Note we use `srcWithNode2nix` as the source, so this allows users to
+          # override srcWithNode2nix's source as the "root source" of all of the
+          # following derivations.
+          src = srcWithNode2nix;
+          buildInputs = [
+            nodejs
+            mkNpmExtraDependenciesCmd
+            dataLinkFarmCmd
+          ];
 
-        # `npmExtraDependencies` is used for Nix to gather all the transitive
-        # dependencies so the user doesn't have to manually specify all the
-        # dependencies.
-        # Note(jaredponn): we confusingly just name this `npmExtraDependencies`
-        # when it really is the transitive closure.
-        npmExtraDependencies = npmExtraDependenciesTransitiveClosure;
+          # `npmExtraDependencies` is used for Nix to gather all the transitive
+          # dependencies so the user doesn't have to manually specify all the
+          # dependencies.
+          # Note(jaredponn): we confusingly just name this `npmExtraDependencies`
+          # when it really is the transitive closure.
+          npmExtraDependencies = npmExtraDependenciesTransitiveClosure;
 
-        configurePhase =
-          ''
+          configurePhase = ''
             runHook preConfigure
                 
             ln -sf \
@@ -289,15 +297,14 @@ pkgs.lib.makeExtensible
             runHook postConfigure
           '';
 
-        # Allow the the user to override the build script in the derivation
-        inherit npmBuildScript;
+          # Allow the the user to override the build script in the derivation
+          inherit npmBuildScript;
 
-        # Set some sane environment variables for npm
-        NPM_CONFIG_OFFLINE = true;
-        NPM_CONFIG_LOGLEVEL = "verbose";
+          # Set some sane environment variables for npm
+          NPM_CONFIG_OFFLINE = true;
+          NPM_CONFIG_LOGLEVEL = "verbose";
 
-        buildPhase =
-          ''
+          buildPhase = ''
             runHook preBuild
 
             export HOME=$(mktemp -d)
@@ -307,8 +314,7 @@ pkgs.lib.makeExtensible
             runHook postBuild
           '';
 
-        installPhase =
-          ''
+          installPhase = ''
             runHook preInstall
 
             mkdir -p "$out"
@@ -334,31 +340,37 @@ pkgs.lib.makeExtensible
 
             runHook postInstall
           '';
-      };
+        };
 
-      # Unzips the files from `npmPack` and puts them in
-      # `$out/lib/node_modules/<package-name>/`
-      # TODO(jaredponn): pry open the npm source code and find a way to list
-      # the files s.t. we can just copy them ourselves.
-      npmLib = pkgs.stdenv.mkDerivation {
-        name = "${name}-typescript-lib";
-        dontUnpack = true;
-        installPhase = ''
-          mkdir -p "$out/lib/node_modules/${srcWithNode2nixIfd.args.packageName}"
-          find "${npmPack}/tarballs" -type f -mindepth 1 -maxdepth 1 -exec tar -xzvf '{}' \;
-          find ./package -mindepth 1 -maxdepth 1 -exec mv '{}' "$out/lib/node_modules/${srcWithNode2nixIfd.args.packageName}" \;
-        '';
-        inherit (project) npmExtraDependencies;
-      };
+        # Unzips the files from `npmPack` and puts them in
+        # `$out/lib/node_modules/<package-name>/`
+        # TODO(jaredponn): pry open the npm source code and find a way to list
+        # the files s.t. we can just copy them ourselves.
+        npmLib = pkgs.stdenv.mkDerivation {
+          name = "${name}-typescript-lib";
+          dontUnpack = true;
+          installPhase = ''
+            mkdir -p "$out/lib/node_modules/${srcWithNode2nixIfd.args.packageName}"
+            find "${npmPack}/tarballs" -type f -mindepth 1 -maxdepth 1 -exec tar -xzvf '{}' \;
+            find ./package -mindepth 1 -maxdepth 1 -exec mv '{}' "$out/lib/node_modules/${srcWithNode2nixIfd.args.packageName}" \;
+          '';
+          inherit (project) npmExtraDependencies;
+        };
 
-      # Alias for `project`
-      npmExe = project;
+        # Alias for `project`
+        npmExe = project;
 
-      shell = pkgs.mkShell {
-        packages = [ nodejs mkNpmExtraDependenciesCmd dataLinkFarmCmd ] ++ testTools ++ devShellTools;
+        shell = pkgs.mkShell {
+          packages =
+            [
+              nodejs
+              mkNpmExtraDependenciesCmd
+              dataLinkFarmCmd
+            ]
+            ++ testTools
+            ++ devShellTools;
 
-        shellHook =
-          ''
+          shellHook = ''
             # Check if the current directory's `package.json`'s is the same as
             # the `package.json` of the project.
             # This is a coarse test to verify that we are entering the shell in
@@ -383,15 +395,14 @@ pkgs.lib.makeExtensible
             ${devShellHook}
           '';
 
-      };
+        };
 
-      # Creates a tarball of `project` using `npm pack` and puts it in the nix
-      # store.
-      npmPack = project.overrideAttrs (_self: _super:
-        {
-          name = "${name}-tarball";
-          installPhase =
-            ''
+        # Creates a tarball of `project` using `npm pack` and puts it in the nix
+        # store.
+        npmPack = project.overrideAttrs (
+          _self: _super: {
+            name = "${name}-tarball";
+            installPhase = ''
               # NOTE(jaredponn): the following commands are used to ensure that
               # the `.extra-dependencies` get copied in the resulting tarball
               # so `npm` can find it later when trying to e.g. install things.
@@ -411,25 +422,25 @@ pkgs.lib.makeExtensible
               mkdir -p "$out/tarballs"
               npm pack --pack-destination "$out/tarballs"
             '';
-        });
+          }
+        );
 
-
-      # Run tests with `npm test`.
-      test = project.overrideAttrs (_self: super:
-        {
-          # Append the test command at the end.
-          postBuild =
-            ''
+        # Run tests with `npm test`.
+        test = project.overrideAttrs (
+          _self: super: {
+            # Append the test command at the end.
+            postBuild = ''
               npm test
             '';
-          installPhase =
-            ''
+            installPhase = ''
               touch "$out"
             '';
 
-          buildInputs = super.buildInputs ++ testTools;
-        });
-    });
+            buildInputs = super.buildInputs ++ testTools;
+          }
+        );
+      }
+    );
 
     ################################
     # Output derivations to use in your flake.
@@ -450,4 +461,4 @@ pkgs.lib.makeExtensible
       "${name}-typescript-test" = test;
     };
   }
-  )
+)

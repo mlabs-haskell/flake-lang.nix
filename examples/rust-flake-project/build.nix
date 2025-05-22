@@ -1,15 +1,16 @@
-{ ... }: {
-  perSystem = { config, ... }:
+{ ... }:
+{
+  perSystem =
+    { config, ... }:
 
     let
-      rustFlake = config.lib.rustFlake
-        {
-          src = ./.;
-          crateName = "rust-flake-project";
+      rustFlake = config.lib.rustFlake {
+        src = ./.;
+        crateName = "rust-flake-project";
 
-          devShellHook = config.settings.shell.hook;
-          exportTests = true;
-        };
+        devShellHook = config.settings.shell.hook;
+        exportTests = true;
+      };
     in
     {
 
