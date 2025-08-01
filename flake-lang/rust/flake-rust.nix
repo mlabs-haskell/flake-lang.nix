@@ -147,24 +147,23 @@ let
     pkgs.openssl.dev
   ];
 
-  commonArgs =
-    {
-      nativeBuildInputs = defNativeBuildInputs ++ nativeBuildInputs;
-      buildInputs = defBuildInputs ++ buildInputs;
-      src = buildEnv;
-      pname = crateName;
-      strictDeps = true;
-    }
-    // optionalAttrs (target != null) {
-      CARGO_BUILD_TARGET = target;
-    }
-    // optionalAttrs (extraRustcFlags != null) {
-      CARGO_BUILD_RUSTFLAGS = extraRustcFlags;
-    }
-    // optionalAttrs (extraCargoArgs != null) {
-      cargoExtraArgs = extraCargoArgs;
-    }
-    // optionalAttrs (extraEnvVars != null) extraEnvVars;
+  commonArgs = {
+    nativeBuildInputs = defNativeBuildInputs ++ nativeBuildInputs;
+    buildInputs = defBuildInputs ++ buildInputs;
+    src = buildEnv;
+    pname = crateName;
+    strictDeps = true;
+  }
+  // optionalAttrs (target != null) {
+    CARGO_BUILD_TARGET = target;
+  }
+  // optionalAttrs (extraRustcFlags != null) {
+    CARGO_BUILD_RUSTFLAGS = extraRustcFlags;
+  }
+  // optionalAttrs (extraCargoArgs != null) {
+    cargoExtraArgs = extraCargoArgs;
+  }
+  // optionalAttrs (extraEnvVars != null) extraEnvVars;
 
   cargoArtifacts = craneLib.buildDepsOnly commonArgs;
 
