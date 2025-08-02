@@ -361,14 +361,13 @@ pkgs.lib.makeExtensible (
         npmExe = project;
 
         shell = pkgs.mkShell {
-          packages =
-            [
-              nodejs
-              mkNpmExtraDependenciesCmd
-              dataLinkFarmCmd
-            ]
-            ++ testTools
-            ++ devShellTools;
+          packages = [
+            nodejs
+            mkNpmExtraDependenciesCmd
+            dataLinkFarmCmd
+          ]
+          ++ testTools
+          ++ devShellTools;
 
           shellHook = ''
             # Check if the current directory's `package.json`'s is the same as
