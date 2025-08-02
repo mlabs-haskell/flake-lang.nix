@@ -24,9 +24,9 @@ _: {
           k: v: pkgs.lib.attrsets.nameValuePair ("checks:${k}") v
         ) hsFlake.checks
         // {
-          "devShells:haskell-plutus-flake-project" = hsFlake.devShell;
+          "devShells:haskell-plutus-flake-project" = hsFlake.devShells.default;
         };
 
-      devShells.dev-haskell-plutus-flake-project = hsFlake.devShell;
+      devShells.dev-haskell-plutus-flake-project = hsFlake.devShells.default;
     };
 }
