@@ -360,6 +360,33 @@ pkgs.lib.makeExtensible (
         # Alias for `project`
         npmExe = project;
 
+        updateShell = pkgs.mkShell {
+          packages = [
+            nodejs
+            mkNpmExtraDependenciesCmd
+            dataLinkFarmCmd
+          ]
+          ++ testTools
+          ++ devShellTools;
+
+          shellHook = ''
+            # Check if the current directory's `package.json`'s is the same as
+            # the `package.json` of the project.
+            # This is a coarse test to verify that we are entering the shell in
+            # the same directory the project is in.
+            if ! { test -f ./package.json && cmp -s ./package.json "${srcWithNode2nix}/package.json" ; }
+            then
+                1>&2 echo 'flake-lang.nix: warning: entering the development shell in a different directory from the actual directory of the project.'
+                1>&2 echo '    When entering the development shell, flake-lang.nix provides the folder `./node_modules` (among others), so it is important to enter the development shell in the same directory the project is in.'
+            fi
+
+            ${pkgs.lib.escapeShellArg mkNpmExtraDependenciesCmd.name}
+            ${pkgs.lib.escapeShellArg dataLinkFarmCmd.name}
+
+            ${devShellHook}
+          '';
+        };
+
         shell = pkgs.mkShell {
           packages = [
             nodejs
@@ -446,6 +473,7 @@ pkgs.lib.makeExtensible (
     #################################
     devShells = {
       "${name}-typescript" = shell;
+      "${name}-typescript-update" = updateShell;
     };
 
     packages = {
