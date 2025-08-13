@@ -4,6 +4,7 @@
 _: {
   imports = [
     ./haskell-flake-project/build.nix
+    ./haskell-flake-project-with-extra-dependency/build.nix
     ./haskell-plutus-flake-project/build.nix
     ./rust-flake-project/build.nix
     ./rust-flake-project-with-extra-dependency/build.nix
