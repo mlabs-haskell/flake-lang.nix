@@ -76,7 +76,10 @@ let
     with (haskellNixOpts opts);
     (pkgs.haskell-nix.cabalProject' (
       [
-        ((import ./haskell.nix/extra-hackage.nix) compiler-nix-name)
+        ((import ./haskell.nix/extra-hackage.nix) {
+          inherit compiler-nix-name;
+          inherit index-state;
+        })
         (hsNixProj opts)
       ]
       ++ modules
