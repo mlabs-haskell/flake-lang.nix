@@ -14,6 +14,7 @@ _: {
         strictComp = true;
         packageJson = ./package.json;
         packageLock = ./package-lock.json;
+        nodejs = pkgs.nodejs-slim_24;
         shell = {
           withRuntime = false;
           packageLockOnly = true;

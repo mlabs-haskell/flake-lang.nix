@@ -43,4 +43,6 @@ let
     devShell = purs.devShell;
   };
 in
-mkFlake pursProjOpts.projectName (pkgs.purescriptProject pursProjOpts)
+mkFlake pursProjOpts.projectName (
+  pkgs.purescriptProject ({ nodejs = pkgs.nodejs; } // pursProjOpts)
+)
