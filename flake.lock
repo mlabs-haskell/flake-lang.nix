@@ -1036,8 +1036,6 @@
         "flake-compat": "flake-compat_10",
         "hercules-ci-effects": "hercules-ci-effects_2",
         "nixpkgs": [
-          "ctl",
-          "cardano-node",
           "nixpkgs"
         ],
         "nixpkgs-arion": "nixpkgs-arion",
