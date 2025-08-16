@@ -16,7 +16,10 @@
           markdownlint.enable = true;
 
           # Nix
-          nixfmt-rfc-style.enable = true;
+          nixfmt-rfc-style = {
+            enable = true;
+            excludes = [ "spago-packages.nix" ];
+          };
           deadnix.enable = true;
 
           # Haskell

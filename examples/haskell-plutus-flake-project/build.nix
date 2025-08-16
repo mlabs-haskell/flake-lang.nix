@@ -28,5 +28,6 @@ _: {
         };
 
       devShells.dev-haskell-plutus-flake-project = hsFlake.devShells.default;
+
     };
 }
