@@ -1,5 +1,5 @@
 { name = "purescript-flake-project"
-, dependencies = [ "console" ]
+, dependencies = [ "console", "effect", "prelude" ]
 , packages = ./packages.dhall
-, sources = [ "src/**/*.purs" ]
+, sources = [ "src/**/*.purs", "test/**/*.purs" ]
 }
