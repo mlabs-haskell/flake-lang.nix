@@ -23,9 +23,8 @@
 
     ## Cardano transaction library (leveraging CTL's Purescript Nix machinery)
     ctl = {
-      url = "github:plutonomicon/cardano-transaction-lib?ref=develop";
+      url = "github:plutonomicon/cardano-transaction-lib?ref=szg251/flake-update";
       inputs.db-sync.follows = "db-sync-ctl";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     db-sync-ctl = {
