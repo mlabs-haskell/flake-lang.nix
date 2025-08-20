@@ -85,13 +85,12 @@ let
             echo ${dir}
             ln -s ${dir}/* hackage/
           '';
-          indexStateDate = builtins.substring 0 10 index-state;
         in
         pkgs.runCommand "01-index.tar.gz" { } ''
           mkdir hackage
           ${builtins.concatStringsSep "" (map f hackageDirs)}
           cd hackage
-          tar --sort=name --owner=root:0 --group=root:0 --mtime='UTC ${indexStateDate}' -hczvf $out */*/*
+          tar --sort=name --owner=root:0 --group=root:0 --mtime='${index-state}' -hczvf $out */*/*
         '';
 
       mkHackageTarballFor = pkg-specs: mkHackageTarballFromDirsFor (map mkHackageDirFor pkg-specs);
