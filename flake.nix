@@ -21,10 +21,9 @@
 
     # Purescript
 
-    ## Cardano transaction library (leveraging CTL's Purescript Nix machinery)
-    ctl = {
-      url = "github:plutonomicon/cardano-transaction-lib?ref=szg251/flake-update";
-      inputs.db-sync.follows = "db-sync-ctl";
+    easy-purescript-nix = {
+      url = "github:justinwoo/easy-purescript-nix";
+      flake = false;
     };
 
     db-sync-ctl = {
