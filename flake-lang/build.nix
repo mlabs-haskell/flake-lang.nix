@@ -56,7 +56,7 @@
     perSystem = flake-parts-lib.mkPerSystemOption (
       {
         pkgs,
-        pkgsForCtl,
+        pkgsForPurs,
         pkgsForHaskellNix,
         pkgsForRust,
         ...
@@ -66,7 +66,7 @@
           lib = {
             purescriptFlake = lib.mkOption {
               type = lib.types.functionTo lib.types.attrs;
-              default = import ./flake-purescript.nix pkgsForCtl;
+              default = import ./flake-purescript.nix pkgsForPurs;
               readOnly = true;
               description = ''
                 TODO(jaredponn): write down documentation here

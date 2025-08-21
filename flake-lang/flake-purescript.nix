@@ -43,4 +43,6 @@ let
     devShell = purs.devShell;
   };
 in
-mkFlake pursProjOpts.projectName (pkgs.purescriptProject pursProjOpts)
+mkFlake pursProjOpts.projectName (
+  import ./purescript/purescript-project.nix { inherit pkgs; } pursProjOpts
+)
