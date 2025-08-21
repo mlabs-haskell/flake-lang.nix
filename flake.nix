@@ -1,7 +1,7 @@
 {
   description = "Tools for generating flakes";
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 
     # Haskell
 
@@ -23,7 +23,7 @@
 
     ## Cardano transaction library (leveraging CTL's Purescript Nix machinery)
     ctl = {
-      url = "github:plutonomicon/cardano-transaction-lib?ref=develop";
+      url = "github:plutonomicon/cardano-transaction-lib?ref=szg251/flake-update";
       inputs.db-sync.follows = "db-sync-ctl";
     };
 

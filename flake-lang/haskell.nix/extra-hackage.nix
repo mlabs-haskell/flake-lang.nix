@@ -1,8 +1,12 @@
 # Creates a haskell.nix module that adds the `extraHackage` options for specifying Cabal sources as additional compile dependencies.
-compiler-nix-name:
+{ compiler-nix-name, index-state }:
 let
   mylib =
-    { pkgs, compiler-nix-name }:
+    {
+      pkgs,
+      compiler-nix-name,
+      index-state,
+    }:
     rec {
       mkPackageSpec =
         src:
@@ -86,7 +90,7 @@ let
           mkdir hackage
           ${builtins.concatStringsSep "" (map f hackageDirs)}
           cd hackage
-          tar --sort=name --owner=root:0 --group=root:0 --mtime='UTC 2009-01-01' -hczvf $out */*/*
+          tar --sort=name --owner=root:0 --group=root:0 --mtime='${index-state}' -hczvf $out */*/*
         '';
 
       mkHackageTarballFor = pkg-specs: mkHackageTarballFromDirsFor (map mkHackageDirFor pkg-specs);
@@ -135,8 +139,8 @@ let
 
       mkHackageFor = srcs: mkHackageFromSpecFor (map mkPackageSpec srcs);
     };
-in
 
+in
 {
   lib,
   config,
@@ -147,6 +151,7 @@ let
   l = mylib {
     inherit pkgs;
     inherit compiler-nix-name;
+    inherit index-state;
   };
   # FIXME: We have only one Hackage now
   # FIXME: Do copySrc here, but for some reason Nix shits itself

@@ -5,9 +5,13 @@ _: {
       hsFlake = config.lib.haskellFlake {
         src = ./.;
 
-        name = "haskell-flake-project";
+        name = "haskell-flake-project-with-extra-dependency";
 
         inherit (config.settings.haskell) index-state compiler-nix-name;
+
+        dependencies = [
+          "${config.packages.haskell-flake-project-src}"
+        ];
 
         devShellTools = config.settings.shell.tools;
         devShellHook = config.settings.shell.hook;
@@ -16,15 +20,6 @@ _: {
     in
 
     {
-      packages = {
-        haskell-flake-project-src = pkgs.stdenv.mkDerivation {
-          name = "haskell-flake-project-src";
-          src = ./.;
-          phases = "installPhase";
-          installPhase = "ln -s $src $out";
-        };
-      };
-
       checks =
         pkgs.lib.attrsets.mapAttrs' (
           k: v: pkgs.lib.attrsets.nameValuePair ("package:${k}") v
@@ -33,9 +28,9 @@ _: {
           k: v: pkgs.lib.attrsets.nameValuePair ("checks:${k}") v
         ) hsFlake.checks
         // {
-          "devShells:haskell-flake-project" = hsFlake.devShells.default;
+          "devShells:haskell-flake-project-with-extra-dependency" = hsFlake.devShells.default;
         };
 
-      devShells.dev-haskell-flake-project = hsFlake.devShells.default;
+      devShells.dev-haskell-flake-project-with-extra-dependency = hsFlake.devShells.default;
     };
 }
