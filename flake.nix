@@ -1,7 +1,7 @@
 {
   description = "Tools for generating flakes";
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 
     # Haskell
 
