@@ -37,7 +37,7 @@
           inherit system;
         };
 
-        pkgsForCtl = import inputs.nixpkgs {
+        pkgsForPurs = import inputs.nixpkgs {
           inherit system;
           inherit (inputs.haskell-nix) config;
           overlays = [
