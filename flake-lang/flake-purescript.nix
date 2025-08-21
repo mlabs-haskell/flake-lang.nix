@@ -111,11 +111,6 @@ let
           # If `true`, `npm i` will only write to your `package-lock.json` instead
           # of installing to a local `node_modules`
           packageLockOnly ? false,
-          # If `true`, the `chromium` package from your package set will be made
-          # available in the shell environment. This can help with ensuring that
-          # any e2e tests that you write and run with `Contract.Test.E2E` are
-          # reproducible
-          withChromium ? pkgs.stdenv.isLinux,
         }:
         assert pkgs.lib.assertOneOf "formatter" formatter [
           "purs-tidy"
@@ -144,8 +139,6 @@ let
             ]
 
             (lists.optional pursls pkgs.easy-ps.purescript-language-server)
-
-            (lists.optional withChromium pkgs.chromium)
           ];
           shellHook = ''
             export NODE_PATH="${nodeModules}/lib/node_modules"
