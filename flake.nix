@@ -1,7 +1,7 @@
 {
   description = "Tools for generating flakes";
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.follows = "haskell-nix/nixpkgs-unstable";
 
     # Haskell
 
@@ -42,7 +42,10 @@
     cardano-haskell-packages.flake = false;
 
     ## Some crypto overlays necessary for Plutus
-    iohk-nix.url = "github:input-output-hk/iohk-nix";
+    iohk-nix = {
+      url = "github:input-output-hk/iohk-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     ## Plutarch eDSL
     plutarch = {
