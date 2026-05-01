@@ -200,7 +200,7 @@ let
   '';
 in
 {
-  devShells."dev-${crateName}-rust" = craneLib.devShell {
+  devShells."dev-${crateName}-rust" = craneLib.devShell ({
     buildInputs = commonArgs.buildInputs ++ commonArgs.nativeBuildInputs;
     packages = devShellTools ++ [ pkgs.cargo-nextest ] ++ testTools;
     shellHook = ''
@@ -208,7 +208,7 @@ in
       ${linkData}
       ${devShellHook}
     '';
-  };
+  } // optionalAttrs (extraEnvVars != null) extraEnvVars);
 
   packages =
     (optionalAttrs generateDocs {
